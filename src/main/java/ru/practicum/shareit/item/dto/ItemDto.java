@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 /**
  * <p>Data Transfer Object для сущности "Вещь"</p>
- * <p>Data-класс Item содержит поля:</p>
+ * <p>Dto-класс Item содержит поля:</p>
  * <ul>
  *     <li>id - уникальный идентификатор вещи, тип Long;</li>
  *     <li>name - краткое название, тип String;</li>
