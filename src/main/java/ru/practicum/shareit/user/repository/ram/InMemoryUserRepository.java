@@ -23,7 +23,7 @@ import java.util.Optional;
 public class InMemoryUserRepository implements UserRepository {
     private final List<User> users;
 
-    private Long id = 1L;
+    private Integer id = 1;
 
     @Override
     public List<User> getAllUsers() {
@@ -32,7 +32,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User getById(Long id) {
+    public User getById(Integer id) {
         log.info("Хранилище: получение пользователя по id {}", id);
         Optional<User> user = users.stream()
                 .filter(u -> Objects.equals(u.getId(), id))
@@ -54,7 +54,7 @@ public class InMemoryUserRepository implements UserRepository {
     public User updateUser(User user) {
         log.info("Хранилище: обновление пользователя с id {}", user.getId());
         checkEmail(user.getEmail());
-        User updatedUser = users.get(Math.toIntExact(user.getId()));
+        User updatedUser = users.get(user.getId());
         if (user.getName() != null) {
             updatedUser.setName(user.getName());
         }
@@ -65,7 +65,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(Integer id) {
         log.info("Хранилище: удаление пользователя с id {}", id);
         users.remove(getById(id));
     }

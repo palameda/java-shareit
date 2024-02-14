@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Интерфейс UserRepository содежит сигнатуры метотов, опреледяющих функционал,
- * который будет реальзован в классах, описывающих слой хранилища
+ * который будет реальзован в классах, описывающих слой хранилища для сущности User
  */
 
 public interface UserRepository {
@@ -21,7 +21,7 @@ public interface UserRepository {
      * @param id
      * @return User
      */
-    User getById(Long id);
+    User getById(Integer id);
 
 
     /**
@@ -43,6 +43,6 @@ public interface UserRepository {
      * Метод deleteUser удаляет из хранилища данные зарегистрированного пользователя по переданному идентификатору
      * @param id
      */
-    void deleteUser(Long id);
+    void deleteUser(Integer id);
 
 }
