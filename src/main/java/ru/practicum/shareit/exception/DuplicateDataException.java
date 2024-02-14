@@ -1,10 +1,10 @@
 package ru.practicum.shareit.exception;
 
 /**
- * Исключение DublicateDataException возникает при запросе данных, которые уже зарегистрированы в хранилище
+ * Исключение DuplicateDataException возникает при запросе данных, которые уже зарегистрированы в хранилище
  */
-public class DublicateDataException extends RuntimeException {
-    public DublicateDataException(String message) {
+public class DuplicateDataException extends RuntimeException {
+    public DuplicateDataException(String message) {
         super(message);
     }
 }
