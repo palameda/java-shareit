@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,10 +15,8 @@ import javax.validation.constraints.NotBlank;
  *     <li>email - адрес электронной почты пользователя, тип String.</li>
  * </ul>
  */
-
 @Data
 @Builder
-@AllArgsConstructor
 public class User {
     @Min(value = 1, message = "Идентификатор должен быть положительным числом")
     private Integer id;
