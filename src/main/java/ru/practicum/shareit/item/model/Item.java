@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
  *     <li>id - уникальный идентификатор вещи, тип Long;</li>
  *     <li>name - краткое название, тип String;</li>
  *     <li>description - развёрнутое описание, тип String;</li>
- *     <li>owner - владелец вещи, тип User;</li>
+ *     <li>ownerId - уникальный идентификатор владельца вещи, тип Long</li>
  *     <li>available - статус о доступности вещи для аренды, тип Boolean.</li>
  * </ul>
  */
@@ -33,6 +33,7 @@ public class Item {
     @Size(max = 255, message = "Размер описания не должен превышать 255 символов")
     private String description;
     @NotNull(message = "У вещи должен быть владелец")
-    private User owner;
+    @Min(value = 1L, message = "Идентификатор должен быть положительным числом")
+    private Long ownerId;
     private Boolean available;
 }
