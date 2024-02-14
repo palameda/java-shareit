@@ -12,11 +12,11 @@ import ru.practicum.shareit.item.model.Item;
 @UtilityClass
 public class ItemMapper {
     /**
-     * Статичный метод DtoToItem конвертирует объект itemDto в объект класса Item
+     * Статичный метод dtoToItem конвертирует объект itemDto в объект класса Item
      * @param  itemDto
      * @return Item
      */
-    public static Item DtoToItem(ItemDto itemDto) {
+    public static Item dtoToItem(ItemDto itemDto) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
@@ -27,11 +27,11 @@ public class ItemMapper {
     }
 
     /**
-     * Статичный метод ItemToDto конвертирует объект item в объект класса ItemDto
+     * Статичный метод itemToDto конвертирует объект item в объект класса ItemDto
      * @param item
      * @return ItemDto
      */
-    public static ItemDto ItemToDto(Item item) {
+    public static ItemDto itemToDto(Item item) {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())

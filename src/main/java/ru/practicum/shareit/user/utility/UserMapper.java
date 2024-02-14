@@ -14,11 +14,11 @@ import ru.practicum.shareit.user.model.User;
 public class UserMapper {
 
     /**
-     * Статичный метод DtoToUser конвертирует объект userDto в объект класса User
+     * Статичный метод dtoToUser конвертирует объект userDto в объект класса User
      * @param userDto
      * @return User
      */
-    public static User DtoToUser(UserDto userDto) {
+    public static User dtoToUser(UserDto userDto) {
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())
@@ -27,11 +27,11 @@ public class UserMapper {
     }
 
     /**
-     * Статичный метод UserToDto конвертирует объект user в объект класса UserDto
+     * Статичный метод userToDto конвертирует объект user в объект класса UserDto
      * @param user
      * @return UserDto
      */
-    public static UserDto UserToDto(User user) {
+    public static UserDto userToDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
