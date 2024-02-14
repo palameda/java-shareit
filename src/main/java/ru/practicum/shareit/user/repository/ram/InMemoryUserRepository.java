@@ -54,7 +54,7 @@ public class InMemoryUserRepository implements UserRepository {
     public User updateUser(User user) {
         log.info("Хранилище: обновление пользователя с id {}", user.getId());
         checkEmail(user.getEmail());
-        User updatedUser = users.get(user.getId());
+        User updatedUser = getById(user.getId());
         if (user.getName() != null) {
             updatedUser.setName(user.getName());
         }
