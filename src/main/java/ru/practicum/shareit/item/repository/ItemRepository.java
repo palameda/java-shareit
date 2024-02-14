@@ -10,10 +10,11 @@ import java.util.List;
  */
 public interface ItemRepository {
     /**
-     * Метод getAllItems возвращает список зарегистрированных вещей
+     * Метод getAllItems возвращает список вещей, зарегистрированных на пользователя по ownerId
+     * @param ownerId
      * @return List
      */
-    List<Item> getAllItems();
+    List<Item> getAllItems(Integer ownerId);
 
     /**
      * Метод getById возвращает данные о зарегистрированной вещи по переданному идентификатору
