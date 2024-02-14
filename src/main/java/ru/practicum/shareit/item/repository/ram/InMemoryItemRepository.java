@@ -74,6 +74,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public List<Item> seekItem(String searchQuery) {
+        log.info("Хранилище: поиск вещи по запросу {}", searchQuery);
         if (searchQuery == null) {
             return List.of();
         }
