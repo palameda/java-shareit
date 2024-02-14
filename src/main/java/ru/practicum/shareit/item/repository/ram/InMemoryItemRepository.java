@@ -75,13 +75,13 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public List<Item> seekItem(String searchQuery) {
         log.info("Хранилище: поиск вещи по запросу {}", searchQuery);
-        if (searchQuery == null) {
-            return List.of();
+        if (searchQuery != null) {
+            return items.stream()
+                    .filter(Item::getAvailable)
+                    .filter(item -> (item.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                            item.getDescription().toLowerCase().contains(searchQuery.toLowerCase())))
+                    .collect(Collectors.toList());
         }
-        return items.stream()
-                .filter(Item::getAvailable)
-                .filter(item -> (item.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||
-                        item.getDescription().toLowerCase().contains(searchQuery.toLowerCase())))
-                .collect(Collectors.toList());
+        return List.of();
     }
 }
