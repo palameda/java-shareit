@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Класс InMemoryItemRepository реализует методы интерфейса ItemRepository.
+ * Класс InMemoryItemRepository реализует методы интерфейса {@link ItemRepository}.
  * Описывает реализацию фунциональности для хранения данных о вещах в оперативной памяти.
  */
 
@@ -25,10 +25,10 @@ public class InMemoryItemRepository implements ItemRepository {
     private Integer id = 1;
 
     @Override
-    public List<Item> getAllItems(Integer ownerId) {
-        log.info("Хранилище: получение списка всех вещей, зарегистрированных на пользователя с id {}", ownerId);
+    public List<Item> getAllItems(Integer userId) {
+        log.info("Хранилище: получение списка всех вещей, зарегистрированных на пользователя с id {}", userId);
         return items.stream()
-                .filter(item -> Objects.equals(item.getOwnerId(), ownerId))
+                .filter(item -> Objects.equals(item.getOwnerId(), userId))
                 .collect(Collectors.toList());
     }
 
@@ -42,7 +42,7 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item addItem(Item item) {
+    public Item saveItem(Item item) {
         log.info("Хранилище: добавление данных о новой вещи");
         item.setId(id);
         id++;

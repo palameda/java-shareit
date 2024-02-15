@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Класс InMemoryUserRepository реализует методы интерфейса UserRepository.
+ * Класс InMemoryUserRepository реализует методы интерфейса {@link UserRepository}.
  * Описывает реализацию фунциональности для хранения данных пользователей в оперативной памяти.
  */
 
@@ -32,16 +32,16 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User getById(Integer id) {
-        log.info("Хранилище: получение пользователя по id {}", id);
+    public User getById(Integer userId) {
+        log.info("Хранилище: получение пользователя по id {}", userId);
         Optional<User> user = users.stream()
-                .filter(u -> Objects.equals(u.getId(), id))
+                .filter(u -> Objects.equals(u.getId(), userId))
                 .findFirst();
-        return user.orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
+        return user.orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
     }
 
     @Override
-    public User addUser(User user) {
+    public User saveUser(User user) {
         log.info("Хранилище: добавление нового пользователя");
         checkEmail(user.getEmail());
         user.setId(id);
@@ -65,15 +65,15 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteUser(Integer id) {
-        log.info("Хранилище: удаление пользователя с id {}", id);
-        users.remove(getById(id));
+    public void deleteUser(Integer userId) {
+        log.info("Хранилище: удаление пользователя с id {}", userId);
+        users.remove(getById(userId));
     }
 
     /**
      * Приватный метод checkEmail выполняет проверку переданного в качестве параметра email.
-     * Если email уже зарегистрирован в системе, то будет выброщено исключение DuplicateDataException.
-     * @param email
+     * Если email уже зарегистрирован в системе, то будет выброщено исключение {@link DuplicateDataException}.
+     * @param email адрес электронной почты для проверки
      */
     private void checkEmail(String email) { // следует вынести проверку в слой сервиса
         log.info("Хранилище: проверка email {}", email);

@@ -7,14 +7,16 @@ import ru.practicum.shareit.item.model.Item;
 /**
  * <p>Утилитарный класс ItemMapper предназначен для конвертации объектов, хранящихся в репозитории,
  * в объекты для передачи данных и обратно.</p>
+ * @see Item
+ * @see ItemDto
  */
 
 @UtilityClass
 public class ItemMapper {
     /**
      * Статичный метод dtoToItem конвертирует объект itemDto в объект класса Item
-     * @param  itemDto
-     * @return Item
+     * @param  itemDto dto объект, содержащий данные о вещи
+     * @return объект класса Item, полученный в результате преобразования itemDto
      */
     public static Item dtoToItem(ItemDto itemDto) {
         return Item.builder()
@@ -28,8 +30,8 @@ public class ItemMapper {
 
     /**
      * Статичный метод itemToDto конвертирует объект item в объект класса ItemDto
-     * @param item
-     * @return ItemDto
+     * @param item объект, содержащий данные о вещи
+     * @return объект класса ItemDto, полученный в результате преобразования item
      */
     public static ItemDto itemToDto(Item item) {
         return ItemDto.builder()

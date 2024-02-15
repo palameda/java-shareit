@@ -1,48 +1,47 @@
 package ru.practicum.shareit.user.repository;
 
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.exception.NotFoundException;
 
 import java.util.List;
 
 /**
  * Интерфейс UserRepository содежит сигнатуры метотов, опреледяющих функционал,
- * который будет реальзован в классах, описывающих слой хранилища для сущности User
+ * который будет реальзован в классах, описывающих слой хранилища для сущности {@link User}.
  */
 
 public interface UserRepository {
     /**
-     * Метод getAllUsers возвращает список зарегистрированных пользователей
-     * @return List
+     * Метод getAllUsers возвращает список зарегистрированных пользователей.
+     * @return список пользователей
      */
     List<User> getAllUsers();
 
     /**
-     * Метод getById возвращает данные зарегистрированного пользователя по переданному идентификатору
-     * @param id
-     * @return User
+     * Метод getById возвращает данные зарегистрированного пользователя по переданному идентификатору.
+     * Если пользователь не зарегистрирован, то возникает исключение {@link NotFoundException}.
+     * @param userId идентификатор пользователя
+     * @return извлечённый из хранилия объект класса User
      */
-    User getById(Integer id);
-
+    User getById(Integer userId);
 
     /**
-     * Метод addUser добавляет в хранилище нового пользователя
-     * @param user
-     * @return User
+     * Метод saveUser сохраняет в хранилище данные нового пользователя
+     * @param user данные для сохранения
+     * @return сохранённый в хранилище объект класса User
      */
-    User addUser(User user);
+    User saveUser(User user);
 
     /**
-     * Метод updateUser обновляет данные зарегистрированного пользователя
-     * @param user
-     * @return User
+     * Метод updateUser обновляет данные зарегистрированного пользователя.
+     * @param user данные для обновления
+     * @return обновлённый объект класса User
      */
     User updateUser(User user);
 
-
     /**
-     * Метод deleteUser удаляет из хранилища данные зарегистрированного пользователя по переданному идентификатору
-     * @param id
+     * Метод deleteUser удаляет из хранилища данные зарегистрированного пользователя по переданному идентификатору.
+     * @param userId
      */
-    void deleteUser(Integer id);
-
+    void deleteUser(Integer userId);
 }
