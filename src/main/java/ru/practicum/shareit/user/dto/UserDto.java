@@ -24,8 +24,9 @@ import javax.validation.constraints.NotBlank;
 public class UserDto {
     @Min(value = 1, message = "Идентификатор должен быть положительным числом")
     private Integer id;
+    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String name;
-    @NotBlank
+    @NotBlank(message="Email не может быть пустым")
     @Email(message = "Некорректный email")
     private String email;
 }
