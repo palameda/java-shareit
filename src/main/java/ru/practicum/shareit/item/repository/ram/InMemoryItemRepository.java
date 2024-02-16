@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,17 +34,17 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item getById(Integer id) {
-        log.info("Хранилище: получение данных о вещи по id {}", id);
+    public Item getById(Integer itemId) {
+        log.info("Хранилище: получение данных о вещи по id {}", itemId);
         Optional<Item> item = items.stream()
-                .filter(i -> Objects.equals(i.getId(), id))
+                .filter(i -> Objects.equals(i.getId(), itemId))
                 .findFirst();
-        return item.orElseThrow(() -> new NotFoundException("Вещь с id " + id + " не найдена"));
+        return item.orElseThrow(() -> new NotFoundException("Вещь с id " + itemId + " не найдена"));
     }
 
     @Override
     public Item saveItem(Item item) {
-        log.info("Хранилище: добавление данных о новой вещи");
+        log.info("Хранилище: добавление данных о новой вещи {}", item.getName());
         item.setId(id);
         id++;
         items.add(item);
@@ -67,21 +68,21 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public void deleteItem(Integer id) {
-        log.info("Хранилище: удаление вещи с id {}", id);
-        items.remove(getById(id));
+    public void deleteItem(Integer itemId) {
+        log.info("Хранилище: удаление вещи с id {}", itemId);
+        items.remove(getById(itemId));
     }
 
     @Override
     public List<Item> seekItem(String searchQuery) {
         log.info("Хранилище: поиск вещи по запросу {}", searchQuery);
-        if (searchQuery != null) {
-            return items.stream()
-                    .filter(Item::getAvailable)
-                    .filter(item -> (item.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||
-                            item.getDescription().toLowerCase().contains(searchQuery.toLowerCase())))
-                    .collect(Collectors.toList());
+        if (searchQuery.isBlank()) {
+            return Collections.emptyList();
         }
-        return List.of();
+        return items.stream()
+                .filter(Item::getAvailable)
+                .filter(item -> (item.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                        item.getDescription().toLowerCase().contains(searchQuery.toLowerCase())))
+                .collect(Collectors.toList());
     }
 }
