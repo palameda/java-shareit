@@ -37,7 +37,7 @@ public class InMemoryItemRepository implements ItemRepository {
         log.info("Хранилище: получение данных о вещи по id {}", id);
         Optional<Item> item = items.stream()
                 .filter(i -> Objects.equals(i.getId(), id))
-                .findAny();
+                .findFirst();
         return item.orElseThrow(() -> new NotFoundException("Вещь с id " + id + " не найдена"));
     }
 
