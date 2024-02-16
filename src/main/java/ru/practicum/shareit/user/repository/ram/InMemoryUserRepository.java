@@ -75,7 +75,7 @@ public class InMemoryUserRepository implements UserRepository {
      * Если email уже зарегистрирован в системе, то будет выброщено исключение {@link DuplicateDataException}.
      * @param email адрес электронной почты для проверки
      */
-    private void checkEmail(String email, Integer userId) { // следует вынести проверку в слой сервиса
+    private void checkEmail(String email, Integer userId) {
         log.info("Хранилище: проверка email {}", email);
         if (email == null) {
             return;
