@@ -43,7 +43,7 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public User saveUser(User user) {
         log.info("Хранилище: добавление нового пользователя");
-        checkEmail(user.getEmail());
+        checkEmail(user.getEmail(), id);
         user.setId(id);
         id++;
         users.add(user);
@@ -53,7 +53,7 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public User updateUser(User user) {
         log.info("Хранилище: обновление пользователя с id {}", user.getId());
-        checkEmail(user.getEmail());
+        checkEmail(user.getEmail(), user.getId());
         User updatedUser = getById(user.getId());
         if (user.getName() != null) {
             updatedUser.setName(user.getName());
@@ -75,13 +75,13 @@ public class InMemoryUserRepository implements UserRepository {
      * Если email уже зарегистрирован в системе, то будет выброщено исключение {@link DuplicateDataException}.
      * @param email адрес электронной почты для проверки
      */
-    private void checkEmail(String email) { // следует вынести проверку в слой сервиса
+    private void checkEmail(String email, Integer userId) { // следует вынести проверку в слой сервиса
         log.info("Хранилище: проверка email {}", email);
         if (email == null) {
             return;
         }
         Optional<User> registeredEmail = users.stream()
-                .filter(u -> Objects.equals(u.getEmail(), email))
+                .filter(u -> Objects.equals(u.getEmail(), email) && !Objects.equals(u.getId(), userId))
                 .findFirst();
         if (registeredEmail.isPresent()) {
             throw new DuplicateDataException("Email уже зарегистрирован в системе");
