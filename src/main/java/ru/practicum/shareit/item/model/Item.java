@@ -3,11 +3,6 @@ package ru.practicum.shareit.item.model;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 /**
  * <p><strong>Вещь</strong> - основная сущность сервиса, вокруг которой строится вся работа.</p>
  * <p>Data-класс Item содержит поля:</p>
@@ -23,14 +18,9 @@ import javax.validation.constraints.Size;
 @Data
 @Builder
 public class Item {
-    @Min(value = 1, message = "Идентификатор должен быть положительным числом")
     private Integer id;
-    @NotBlank(message = "Название не может быть пустым")
     private String name;
-    @Size(max = 255, message = "Размер описания не должен превышать 255 символов")
     private String description;
-    @NotNull(message = "У вещи должен быть владелец")
-    @Min(value = 1, message = "Идентификатор должен быть положительным числом")
     private Integer ownerId;
     private Boolean available;
 }
