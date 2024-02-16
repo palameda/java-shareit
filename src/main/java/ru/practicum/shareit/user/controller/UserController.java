@@ -22,7 +22,7 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * Метод findAll обрабатывает GET-метод запроса по эндпоинту /users,
+     * Метод findAll обрабатывает GET-метод запроса к эндпоинту /users,
      * обращается к методу {@link UserService#findAll()}.
      * @return список всех зарегистрированных пользователей, преобразованных в userDto.
      */
@@ -33,7 +33,7 @@ public class UserController {
     }
 
     /**
-     * Метод findById обрабатывает GET-метод запроса по эндпоинту /users/id,
+     * Метод findById обрабатывает GET-метод запроса к эндпоинту /users/id,
      * обращается к методу {@link UserService#findById(Integer)}.
      * @param userId идентификатор пользователя.
      * @return объект класса {@link User}, преобразованный в {@link UserDto}.
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     /**
-     * Метод saveUser обрабатывает POST-метод запроса по эндпоинту /users,
+     * Метод saveUser обрабатывает POST-метод запроса к эндпоинту /users,
      * обращается к методу {@link UserService#saveUser(UserDto)}.
      * @param userDto объект класса {@link UserDto}.
      * @return сохранённый объект класса {@link User}, преобразованный в {@link UserDto}.
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     /**
-     * Метод updateUser обрабатывает PATCH-метод запроса по эндпоинту /users/id,
+     * Метод updateUser обрабатывает PATCH-метод запроса к эндпоинту /users/id,
      * обращается к методу {@link UserService#updateUser(UserDto)}.
      * @param userDto объект класса {@link UserDto}.
      * @param userId идентификатор пользователя, которого нужно отредактировать.
@@ -71,7 +71,7 @@ public class UserController {
     }
 
     /**
-     * Метод deleteUser обрабатывает DELETE-метод запроса по эндпоинту /users/id,
+     * Метод deleteUser обрабатывает DELETE-метод запроса к эндпоинту /users/id,
      * обращается к методу {@link UserService#deleteUser(Integer)}.
      * @param userId идентификатор пользователя, которого нужно удалить.
      */
