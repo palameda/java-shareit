@@ -3,6 +3,8 @@ package ru.practicum.shareit.Item;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import ru.practicum.shareit.exception.DenialOfAccessException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -115,11 +117,11 @@ public class ItemServiceTest {
         Integer itemId = itemService.saveItem(itemDto2, user1.getId()).getId();
         itemDto2.setId(itemId);
         itemDto2.setDescription("Cold");
-        RuntimeException runtimeException = Assertions.assertThrows(
-                RuntimeException.class,
+        DenialOfAccessException exception = Assertions.assertThrows(
+                DenialOfAccessException.class,
                 () -> itemService.updateItem(itemDto2,user2.getId())
         );
-        Assertions.assertEquals(runtimeException.getMessage(),
+        Assertions.assertEquals(exception.getMessage(),
                 String.format("Отказ в доступе. Пользователь с id " +
                         user2.getId() + " не является владельцем вещи " + itemDto2.getName(),
                         "Сообщение об ошибке отличается от ожидаемого")
@@ -162,11 +164,11 @@ public class ItemServiceTest {
     public void testShouldNotReturnItemInCaseOfWrongId () {
         ItemDto savedItem = itemService.saveItem(itemDto1, user1.getId());
         Assertions.assertEquals(savedItem.getId(), 1, "Id не совпадают");
-        RuntimeException runtimeException = Assertions.assertThrows(
-                RuntimeException.class,
+        NotFoundException exception = Assertions.assertThrows(
+                NotFoundException.class,
                 () -> itemService.findById(999)
         );
-        Assertions.assertEquals(runtimeException.getMessage(), "Вещь с id 999 не найдена",
+        Assertions.assertEquals(exception.getMessage(), "Вещь с id 999 не найдена",
                 "Сообщение об ошибке отличается от ожидаемого"
         );
     }
@@ -186,14 +188,14 @@ public class ItemServiceTest {
 
     @Test
     @Order(8)
-    @DisplayName("Удаление вещи по id её владельцем")
+    @DisplayName("Удаление вещи по id пользовалем, который не является владельцем")
     public void testShouldNotDeleteIfUserIsNotOwner() {
         Integer id1 = itemService.saveItem(itemDto1, user1.getId()).getId();
-        RuntimeException runtimeException = Assertions.assertThrows(
-                RuntimeException.class,
+        DenialOfAccessException exception = Assertions.assertThrows(
+                DenialOfAccessException.class,
                 () -> itemService.deleteItem(id1, user2.getId())
         );
-        Assertions.assertEquals(runtimeException.getMessage(), String.format("Отказ в доступе. Пользователь с id " +
+        Assertions.assertEquals(exception.getMessage(), String.format("Отказ в доступе. Пользователь с id " +
                         user2.getId() + " не является владельцем вещи " + itemDto1.getName(),
                 "Сообщение об ошибке отличается от ожидаемого")
         );
