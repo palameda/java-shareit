@@ -41,7 +41,6 @@ public class UserServiceImplementation implements UserService {
     @Override
     public UserDto saveUser(UserDto userDto) {
         log.info("Сервис: обработка запроса на сохранение нового пользователя {}", userDto.toString());
-        // проверка?
         return UserMapper.userToDto(
                 repository.saveUser(UserMapper.dtoToUser(userDto))
         );

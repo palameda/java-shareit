@@ -113,7 +113,7 @@ public class ItemServiceTest {
     @Test
     @Order(3)
     @DisplayName("Обновление вещи пользоваетем, который не являетеся владельцем")
-    public void testShouldNotUpdateIfUserIsNotOwner () {
+    public void testShouldNotUpdateIfUserIsNotOwner() {
         Integer itemId = itemService.saveItem(itemDto2, user1.getId()).getId();
         itemDto2.setId(itemId);
         itemDto2.setDescription("Cold");
@@ -161,7 +161,7 @@ public class ItemServiceTest {
     @Test
     @Order(6)
     @DisplayName("Получение вещи по некорректному id")
-    public void testShouldNotReturnItemInCaseOfWrongId () {
+    public void testShouldNotReturnItemInCaseOfWrongId() {
         ItemDto savedItem = itemService.saveItem(itemDto1, user1.getId());
         Assertions.assertEquals(savedItem.getId(), 1, "Id не совпадают");
         NotFoundException exception = Assertions.assertThrows(

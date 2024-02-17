@@ -98,6 +98,7 @@ public class UserServiceTest {
                 "Сообщение об ошибке не совпадет с ожидаемым"
         );
     }
+
     @Test
     @Order(5)
     @DisplayName("Получение списка всех пользователей")
