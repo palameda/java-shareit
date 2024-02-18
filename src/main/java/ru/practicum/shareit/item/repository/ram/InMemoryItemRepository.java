@@ -7,7 +7,6 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,9 +75,6 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public List<Item> seekItem(String searchQuery) {
         log.info("Хранилище: поиск вещи по запросу {}", searchQuery);
-        if (searchQuery.isBlank()) {
-            return Collections.emptyList();
-        }
         return items.stream()
                 .filter(Item::getAvailable)
                 .filter(item -> (item.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||

@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -101,6 +102,9 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> findItems(@RequestParam String text) {
         log.info("Контроллер: GET-запрос по эндпоинту /items/search со строкой {}", text);
+        if (text.isBlank()) {
+            return Collections.emptyList();
+        }
         return itemService.seekItem(text);
     }
 }

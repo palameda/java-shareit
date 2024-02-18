@@ -211,15 +211,4 @@ public class ItemServiceTest {
         List<ItemDto> wantedItems = itemService.seekItem("лЫж");
         Assertions.assertEquals(wantedItems.size(), 2, "Размеры списков не совпадают");
     }
-
-    @Test
-    @Order(10)
-    @DisplayName("Получение пустого списка вещей по пустому поисковом запросу")
-    public void testShouldReturnEmptyListOfWantedItemsInCaseOfEmptyQuery() {
-        itemService.saveItem(itemDto1, user1.getId());
-        itemService.saveItem(itemDto2, user1.getId());
-        itemService.saveItem(itemDto3, user1.getId());
-        List<ItemDto> wantedItems = itemService.seekItem("");
-        Assertions.assertEquals(wantedItems.size(), 0, "Размеры списков не совпадают");
-    }
 }
