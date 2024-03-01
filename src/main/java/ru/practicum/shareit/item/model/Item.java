@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.model;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.persistence.*;
+
 /**
  * <p><strong>Вещь</strong> - основная сущность сервиса, вокруг которой строится вся работа.</p>
  * <p>Data-класс Item содержит поля:</p>
@@ -17,10 +19,19 @@ import lombok.Data;
 
 @Data
 @Builder
+@Entity
+@Table(name = "items")
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "item_id")
     private Integer id;
+    @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "description", nullable = false)
     private String description;
+    @Column(name = "owner_id", nullable = false)
     private Integer ownerId;
+    @Column(name = "available", nullable = false)
     private Boolean available;
 }
