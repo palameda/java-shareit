@@ -10,6 +10,7 @@ import java.util.List;
  * который будет реальзован в классах, описывающих слой хранилища для сущности {@link User}.
  */
 
+@Deprecated
 public interface UserRepository {
     /**
      * Метод getAllUsers возвращает список зарегистрированных пользователей.

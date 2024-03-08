@@ -20,6 +20,7 @@ import java.util.Optional;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@Deprecated
 public class InMemoryUserRepository implements UserRepository {
     private final List<User> users;
 
