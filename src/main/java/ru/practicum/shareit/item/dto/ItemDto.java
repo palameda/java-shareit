@@ -1,18 +1,19 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import ru.practicum.shareit.booking.dto.BookingReferenceDto;
+import ru.practicum.shareit.comment.dto.ResponseComment;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * <p>Data Transfer Object для сущности "Вещь"</p>
  * <p>Dto-класс Item содержит поля:</p>
  * <ul>
- *     <li>id - уникальный идентификатор вещи, тип Integer;</li>
+ *     <li>itemId - уникальный идентификатор вещи, тип Integer;</li>
  *     <li>name - краткое название, тип String;</li>
  *     <li>description - развёрнутое описание, тип String;</li>
  *     <li>available - статус о доступности вещи для аренды, тип Boolean.</li>
@@ -21,9 +22,12 @@ import javax.validation.constraints.Size;
 
 @Data
 @Builder
+@RequiredArgsConstructor
+@AllArgsConstructor
+
 public class ItemDto {
-    @Min(value = 1, message = "Идентификатор должен быть положительным числом")
-    private Integer id;
+    private Integer itemId;
+    private Integer ownerId;
     @NotBlank(message = "Название не может быть пустым")
     private String name;
     @NotBlank(message = "Описание не может быть пустым")
@@ -31,4 +35,7 @@ public class ItemDto {
     private String description;
     @NotNull(message = "Не указан статус для аренды")
     private Boolean available;
+    private BookingReferenceDto prevBooking;
+    private BookingReferenceDto nextBooking;
+    private List<ResponseComment> comments;
 }
