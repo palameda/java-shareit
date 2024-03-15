@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.comment.dto.RequestComment;
+import ru.practicum.shareit.comment.dto.ResponseComment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.exception.DenialOfAccessException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -21,9 +23,10 @@ public interface ItemService {
     /**
      * Сервисный метод findById возвращает данные о зарегистрированной вещи по переданному идентификатору.
      * @param itemId идентификатор вещи
+     * @param userId идентификатор пользователя
      * @return преобразованный в ItemDto объект класса Item
      */
-    ItemDto findById(Integer itemId);
+    ItemDto findById(Integer itemId, Integer userId);
 
     /**
      * Сервисный метод saveItem отправляет запрос к хранилищу на сохранение данных о новой вещи её владельцем.
@@ -56,4 +59,6 @@ public interface ItemService {
      * @return список вещей, преобразованных в ItemDto, которые были найдены по поисковому запросу
      */
     List<ItemDto> seekItem(String searchQuery);
+
+    ResponseComment addComment(RequestComment comment);
 }
