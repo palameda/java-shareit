@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.comment.dto.RequestComment;
+import ru.practicum.shareit.comment.dto.ResponseComment;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -37,14 +39,15 @@ public class ItemController {
 
     /**
      * Метод findById обрабатывает GET-метод запроса к эндпоинту /items/id,
-     * обращается к методу {@link ItemService#findById(Integer)}.
-     * @param itemId идентификатор вещи.
+     * обращается к методу {@link ItemService#findById(Integer, Integer)}.
+     * @param itemId идентификатор вещи;
+     * @param userId идентификатор пользователя.
      * @return объект класса {@link Item}, преобразованный в {@link ItemDto}.
      */
     @GetMapping("/{id}")
-    public ItemDto findById(@PathVariable("id") Integer itemId) {
+    public ItemDto findById(@PathVariable("id") Integer itemId, @RequestHeader("X-Sharer-User-Id") Integer userId) {
         log.info("Контроллер: GET-запрос по эндпоинту /items/{}", itemId);
-        return itemService.findById(itemId);
+        return itemService.findById(itemId, userId);
     }
 
     /**
@@ -58,6 +61,7 @@ public class ItemController {
     @PostMapping
     public ItemDto saveItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Integer userId) {
         log.info("Контроллер: POST-запрос по эндпоинту /items пользователем с id {}", userId);
+        itemDto.setOwnerId(userId);
         return itemService.saveItem(itemDto, userId);
     }
 
@@ -76,7 +80,7 @@ public class ItemController {
             @RequestHeader("X-Sharer-User-Id") Integer userId,
             @PathVariable("id") Integer itemId) {
         log.info("Контроллер: PATCH-запрос по эндпоинту /items/{} пользователем с id {}", itemId, userId);
-        itemDto.setId(itemId);
+        itemDto.setItemId(itemId);
         return itemService.updateItem(itemDto, userId);
     }
 
@@ -94,7 +98,7 @@ public class ItemController {
     }
 
     /**
-     * Метод findItems обрабатывает GET-метод запроса к энпоинту /items/search,
+     * Метод findItems обрабатывает GET-метод запроса к эндпоинту /items/search,
      * обращается к методу {@link ItemService#seekItem(String)}.
      * @param text поисковый запрос.
      * @return список найденных вещей, которые можно арендовать.
@@ -106,5 +110,22 @@ public class ItemController {
             return Collections.emptyList();
         }
         return itemService.seekItem(text);
+    }
+
+    /**
+     * Метод addComment обработывает POST-метод запроса к эндпоинту items/id/comment,
+     * обращается к методу {@link ItemService#addComment(RequestComment)}
+     * @param requestComment комментарий, который хочет оставить пользователь
+     * @param userId идентификатор пользователя
+     * @param itemId идентификатор вещи
+     * @return объекта класс Comment, преобразованный в ResponseComment (Dto)
+     */
+    @PostMapping("/{id}/comment")
+    public ResponseComment addComment(@Valid @RequestBody RequestComment requestComment,
+                                      @RequestHeader("X-Sharer-User-Id") Integer userId,
+                                      @PathVariable("id") Integer itemId) {
+        requestComment.setItemId(itemId);
+        requestComment.setUserId(userId);
+        return itemService.addComment(requestComment);
     }
 }
