@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class BookingDto {
-    @NotNull
     private Integer id;
     @NotNull
     private Integer itemId;

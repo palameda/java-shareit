@@ -12,7 +12,7 @@ import ru.practicum.shareit.user.model.User;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class DatelessBookingDto {
+public class DatelessBooking {
     private Integer bookingId;
 
     private Item item;

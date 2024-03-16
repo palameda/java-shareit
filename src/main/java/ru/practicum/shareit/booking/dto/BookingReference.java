@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class BookingReferenceDto {
+public class BookingReference {
     private Integer bookingId;
     private Integer bookerId;
 }
