@@ -80,7 +80,8 @@ public class ItemController {
             @RequestHeader("X-Sharer-User-Id") Integer userId,
             @PathVariable("id") Integer itemId) {
         log.info("Контроллер: PATCH-запрос по эндпоинту /items/{} пользователем с id {}", itemId, userId);
-        itemDto.setItemId(itemId);
+        itemDto.setId(itemId);
+        itemDto.setOwnerId(userId);
         return itemService.updateItem(itemDto, userId);
     }
 
