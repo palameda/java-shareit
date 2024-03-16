@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.db.BookingDbRepository;
 import ru.practicum.shareit.booking.utility.BookingMapper;
 import ru.practicum.shareit.exception.DenialOfAccessException;
-import ru.practicum.shareit.exception.DuplicateDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
@@ -22,7 +21,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,103 +35,79 @@ public class BookingServiceImplementation implements BookingService {
 
     @Transactional
     @Override
-    public BookingDto save(BookingDto booking) {
+    public Booking save(BookingDto booking) {
         checkBooking(booking);
-        return BookingMapper.bookingToDto(bookingRepository.save(BookingMapper.dtoToBooking(booking, item, user)));
+        return bookingRepository.save(BookingMapper.dtoToBooking(booking, item, user));
     }
 
     @Transactional
     @Override
-    public BookingDto update(Integer bookingId, Integer bookerId, Status status) {
+    public Booking update(Integer bookingId, Integer bookerId, Status status) {
         Booking booking = checkBookingById(bookingId);
         checkBooking(BookingMapper.bookingToDto(booking));
         if (!Objects.equals(booking.getItem().getOwnerId(), bookingId)) {
-            throw new DuplicateDataException("Пользователю с id " + bookerId + " отказано в редактировании брони. " +
+            throw new NotFoundException("Пользователю с id " + bookerId + " отказано в редактировании брони. " +
                     "Причина: \"не является владельцем вещи\"");
         }
         if (booking.getStatus().equals(status)) {
             throw new ValidationException("Для бронирования с id " + bookingId + " уже установлен статус " + status);
         }
         booking.setStatus(status);
-        return BookingMapper.bookingToDto(bookingRepository.save(booking));
+        return bookingRepository.save(booking);
     }
 
     @Override
-    public BookingDto findBookingById(Integer bookingId, Integer bookerId) {
+    public Booking findBookingById(Integer bookingId, Integer bookerId) {
         Booking booking = checkBookingById(bookingId);
         if (!((Objects.equals(booking.getItem().getOwnerId(), bookerId)) || (Objects.equals(booking.getBooker().getId(), bookerId))))
             throw new DenialOfAccessException("Пользователь с id " + bookerId + " не может выполнять просмотр бронироввания с id " +
                     bookingId);
-        return BookingMapper.bookingToDto(booking);
+        return booking;
     }
 
     @Override
-    public List<BookingDto> findAllBookingForOwner(Integer ownerId, State state) {
+    public List<Booking> findAllBookingForOwner(Integer ownerId, State state) {
         checkUserById(ownerId);
         switch (state) {
             case ALL:
-                return bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                return bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId);
             case CURRENT:
                 return bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByIdDesc(
-                        ownerId, LocalDateTime.now(), LocalDateTime.now()).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                        ownerId, LocalDateTime.now(), LocalDateTime.now());
             case PAST:
                 return bookingRepository.findAllByItemOwnerIdAndStatusAndEndIsBeforeOrderByIdDesc(
-                        ownerId, Status.APPROVED, LocalDateTime.now()).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                        ownerId, Status.APPROVED, LocalDateTime.now());
             case FUTURE:
                 return bookingRepository.findAllByItemOwnerIdAndStatusInAndStartIsAfterOrderByIdDesc(
-                        ownerId, List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now()).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                        ownerId, List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now());
             case WAITING:
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.WAITING).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.WAITING);
             case REJECTED:
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.REJECTED).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.REJECTED);
             default:
                 throw new NotFoundException("Состояние " + state + " не зарегистрировано в системе");
         }
     }
 
     @Override
-    public List<BookingDto> findAllBookingsForBooker(Integer bookerId, State state) {
+    public List<Booking> findAllBookingsForBooker(Integer bookerId, State state) {
         checkUserById(bookerId);
         switch (state) {
             case ALL:
-                return bookingRepository.findAllByBookerIdOrderByIdDesc(bookerId).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                return bookingRepository.findAllByBookerIdOrderByIdDesc(bookerId);
             case CURRENT:
                 return bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByIdAsc(bookerId,
-                        LocalDateTime.now(), LocalDateTime.now()).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                        LocalDateTime.now(), LocalDateTime.now());
             case PAST:
                 return bookingRepository.findAllByBookerIdAndStatusAndEndIsBeforeOrderByIdDesc(bookerId,
-                        Status.APPROVED, LocalDateTime.now()).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                        Status.APPROVED, LocalDateTime.now());
             case FUTURE:
                 return bookingRepository.findAllByBookerIdAndStatusInAndStartIsAfterOrderByIdDesc(bookerId,
-                        List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now()).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                        List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now());
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.WAITING).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.WAITING);
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.REJECTED).stream()
-                        .map(BookingMapper::bookingToDto)
-                        .collect(Collectors.toList());
+                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.REJECTED);
             default:
                 throw new NotFoundException("Состояние " + state + " не зарегистрировано в системе");
         }
