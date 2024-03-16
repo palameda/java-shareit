@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
-import ru.practicum.shareit.booking.dto.BookingReferenceDto;
+import ru.practicum.shareit.booking.dto.BookingReference;
 import ru.practicum.shareit.comment.dto.ResponseComment;
 
 import javax.validation.constraints.NotBlank;
@@ -24,18 +24,17 @@ import java.util.List;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-
 public class ItemDto {
-    private Integer itemId;
+    private Integer id;
     private Integer ownerId;
     @NotBlank(message = "Название не может быть пустым")
     private String name;
     @NotBlank(message = "Описание не может быть пустым")
-    @Size(max = 255, message = "Размер описания не должен превышать 255 символов")
+    @Size(max = 512, message = "Размер описания не должен превышать 255 символов")
     private String description;
     @NotNull(message = "Не указан статус для аренды")
     private Boolean available;
-    private BookingReferenceDto prevBooking;
-    private BookingReferenceDto nextBooking;
+    private BookingReference lastBooking;
+    private BookingReference nextBooking;
     private List<ResponseComment> comments;
 }
