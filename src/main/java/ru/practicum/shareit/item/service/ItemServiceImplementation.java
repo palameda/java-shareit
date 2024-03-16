@@ -50,11 +50,11 @@ public class ItemServiceImplementation implements ItemService {
                 .map(ItemMapper::itemToDto)
                 .peek(itemDto -> {
                     bookingRepository.findByItemIdAndStartIsBeforeOrderByEndDesc(
-                                    itemDto.getItemId(), LocalDateTime.now()).stream()
+                                    itemDto.getId(), LocalDateTime.now()).stream()
                             .findFirst()
-                            .ifPresent(prevBooking -> itemDto.setPrevBooking(ItemMapper.itemToBookingReference(prevBooking)));
+                            .ifPresent(lastBooking -> itemDto.setLastBooking(ItemMapper.itemToBookingReference(lastBooking)));
                     bookingRepository.findByItemIdAndStartIsAfterAndStatusOrderByStartAsc(
-                                    itemDto.getItemId(), LocalDateTime.now(), Status.APPROVED).stream()
+                                    itemDto.getId(), LocalDateTime.now(), Status.APPROVED).stream()
                             .findFirst()
                             .ifPresent(nextBooking -> itemDto.setNextBooking(ItemMapper.itemToBookingReference(nextBooking)));
                 })
@@ -71,9 +71,9 @@ public class ItemServiceImplementation implements ItemService {
             bookingRepository.findByItemIdAndStartIsBeforeOrderByEndDesc(
                             itemId, LocalDateTime.now()).stream()
                     .findFirst()
-                    .ifPresent(prevBooking -> itemDto.setPrevBooking(ItemMapper.itemToBookingReference(prevBooking)));
+                    .ifPresent(lastBooking -> itemDto.setLastBooking(ItemMapper.itemToBookingReference(lastBooking)));
             bookingRepository.findByItemIdAndStartIsAfterAndStatusOrderByStartAsc(
-                    itemDto.getItemId(), LocalDateTime.now(), Status.APPROVED).stream()
+                    itemDto.getId(), LocalDateTime.now(), Status.APPROVED).stream()
                     .findFirst()
                     .ifPresent(nextBooking -> itemDto.setNextBooking(ItemMapper.itemToBookingReference(nextBooking)));
         }
@@ -100,7 +100,7 @@ public class ItemServiceImplementation implements ItemService {
         log.info("Сервис: обработка запроса на изменение данных вещи {} пользователем с id {}", itemDto.getName(), userId);
         checkUser(userId);
         checkPossession(itemDto, userId);
-        ItemDto storedItem = findById(itemDto.getItemId(), userId);
+        ItemDto storedItem = findById(itemDto.getId(), userId);
         if (itemDto.getName() != null) {
             storedItem.setName(itemDto.getName());
         }
@@ -158,7 +158,7 @@ public class ItemServiceImplementation implements ItemService {
      */
     private void checkPossession(ItemDto itemDto, Integer ownerId) {
         log.info("Сервис: проверка принадлежности вещи {} пользователю с id {}", itemDto.getName(), ownerId);
-        Item savedItem = checkItem(itemDto.getItemId());
+        Item savedItem = checkItem(itemDto.getId());
         if (!Objects.equals(savedItem.getOwnerId(), ownerId)) {
             throw new DenialOfAccessException(
                     "Отказ в доступе. Пользователь с id " + ownerId + " не является владельцем вещи " + itemDto.getName()
