@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 public class Comment {
     @Id
+    @Column(name = "comment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
