@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.NotFoundException;
 
@@ -23,38 +24,42 @@ public class BookingController {
     private final BookingService bookingService;
 
     @GetMapping
-    public List<BookingDto> findAllBookingsForBooker(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                              @RequestParam(defaultValue = "ALL") State state) {
+    public List<Booking> findAllBookingsForBooker(@RequestHeader("X-Sharer-User-Id") Integer userId,
+                                                  @RequestParam(defaultValue = "ALL") State state) {
         return bookingService.findAllBookingsForBooker(userId, state);
     }
 
     @GetMapping("/{id}")
-    public BookingDto findBookingById(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public Booking findBookingById(@RequestHeader("X-Sharer-User-Id") Integer userId,
                                  @PathVariable("id") Integer bookingId) {
         return bookingService.findBookingById(bookingId, userId);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getBookingsForOwner(
+    public List<Booking> findBookingsForOwner(
             @RequestHeader("X-Sharer-User-Id") Integer userId, @RequestParam(defaultValue = "ALL") State state) {
         return bookingService.findAllBookingForOwner(userId, state);
     }
 
     @PostMapping()
-    public BookingDto save(@Valid @RequestBody BookingDto booking, @RequestHeader("X-Sharer-User-Id") Integer userId) {
+    public Booking save(@Valid @RequestBody BookingDto booking, @RequestHeader("X-Sharer-User-Id") Integer userId) {
         booking.setUserId(userId);
         booking.setStatus(Status.WAITING);
         return bookingService.save(booking);
     }
 
     @PatchMapping("/{id}")
-    public BookingDto update(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public Booking update(@RequestHeader("X-Sharer-User-Id") Integer userId,
                           @PathVariable("id") Integer bookingId,
                           @RequestParam String approved) {
         Status status;
-        if (approved.equals("true")) status = Status.APPROVED;
-        else if (approved.equals("false")) status = Status.REJECTED;
-        else throw new NotFoundException("Ошибка статуса бронирования");
+        if (approved.equals("true")) {
+            status = Status.APPROVED;
+        } else if (approved.equals("false")) {
+            status = Status.REJECTED;
+        } else {
+            throw new NotFoundException("Ошибка статуса бронирования");
+        }
         return bookingService.update(bookingId, userId, status);
     }
 }
