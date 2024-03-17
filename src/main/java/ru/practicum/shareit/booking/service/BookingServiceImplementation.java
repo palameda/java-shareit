@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.db.BookingDbRepository;
 import ru.practicum.shareit.booking.utility.BookingMapper;
+import ru.practicum.shareit.exception.BadArgumentException;
 import ru.practicum.shareit.exception.DenialOfAccessException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -45,7 +46,7 @@ public class BookingServiceImplementation implements BookingService {
     public Booking update(Integer bookingId, Integer bookerId, Status status) {
         Booking booking = checkBookingById(bookingId);
         checkBooking(BookingMapper.bookingToDto(booking));
-        if (!Objects.equals(booking.getItem().getOwnerId(), bookingId)) {
+        if (!Objects.equals(booking.getItem().getOwnerId(), bookerId)) {
             throw new NotFoundException("Пользователю с id " + bookerId + " отказано в редактировании брони. " +
                     "Причина: \"не является владельцем вещи\"");
         }
@@ -60,15 +61,16 @@ public class BookingServiceImplementation implements BookingService {
     public Booking findBookingById(Integer bookingId, Integer bookerId) {
         Booking booking = checkBookingById(bookingId);
         if (!((Objects.equals(booking.getItem().getOwnerId(), bookerId)) || (Objects.equals(booking.getBooker().getId(), bookerId))))
-            throw new DenialOfAccessException("Пользователь с id " + bookerId + " не может выполнять просмотр бронироввания с id " +
+            throw new NotFoundException("Пользователь с id " + bookerId + " не может выполнять просмотр бронироввания с id " +
                     bookingId);
         return booking;
     }
 
     @Override
-    public List<Booking> findAllBookingForOwner(Integer ownerId, State state) {
+    public List<Booking> findAllBookingForOwner(Integer ownerId, String state) {
         checkUserById(ownerId);
-        switch (state) {
+        State bookingState = checkState(state);
+        switch (bookingState) {
             case ALL:
                 return bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId);
             case CURRENT:
@@ -85,14 +87,15 @@ public class BookingServiceImplementation implements BookingService {
             case REJECTED:
                 return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.REJECTED);
             default:
-                throw new NotFoundException("Состояние " + state + " не зарегистрировано в системе");
+                throw new BadArgumentException("Unknown state: " + state);
         }
     }
 
     @Override
-    public List<Booking> findAllBookingsForBooker(Integer bookerId, State state) {
+    public List<Booking> findAllBookingsForBooker(Integer bookerId, String state) {
         checkUserById(bookerId);
-        switch (state) {
+        State bookingState = checkState(state);
+        switch (bookingState) {
             case ALL:
                 return bookingRepository.findAllByBookerIdOrderByIdDesc(bookerId);
             case CURRENT:
@@ -109,7 +112,7 @@ public class BookingServiceImplementation implements BookingService {
             case REJECTED:
                 return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.REJECTED);
             default:
-                throw new NotFoundException("Состояние " + state + " не зарегистрировано в системе");
+                throw new BadArgumentException("Unknown state: " + state);
         }
     }
 
@@ -152,7 +155,17 @@ public class BookingServiceImplementation implements BookingService {
             throw new ValidationException("Бронь вещи " + booking.toString() + " недоступна");
 
         if (Objects.equals(booking.getUserId(), item.getOwnerId()))
-            throw new DenialOfAccessException("Владелец не может бронировать свои вещи");
+            throw new NotFoundException("Владелец не может бронировать свои вещи");
     }
 
+    private State checkState(String state) {
+        State bookingState;
+        try {
+            bookingState = State.valueOf(state);
+        } catch (IllegalArgumentException exception) {
+            log.error("Unknown state: {}", state);
+            throw new ValidationException("Unknown state: " + state);
+        }
+        return bookingState;
+    }
 }
