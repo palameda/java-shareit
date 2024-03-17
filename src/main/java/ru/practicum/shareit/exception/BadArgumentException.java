@@ -1,4 +1,7 @@
 package ru.practicum.shareit.exception;
 
-public class BadArgumentExeption {
+public class BadArgumentException extends RuntimeException {
+    public BadArgumentException(String message) {
+        super(message);
+    }
 }
