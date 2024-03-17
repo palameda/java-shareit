@@ -12,7 +12,16 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
- * TODO Sprint add-bookings.
+ * Data Transfer Object для сущности "Бронирование"
+ * Dto-класс Booking содержит поля:
+ * <ul>
+ *     <li>id - уникальный идентификатор бронирования, тип {@link Integer}</li>
+ *     <li>itemId - идентификатор бронируемой вещи, тип {@link Integer}</li>
+ *     <li>userId - идентификатор арендатора вещи, тип {@link Integer}</li>
+ *     <li>status - статус бронирования, тип {@link Status}</li>
+ *     <li>start - дата и время начала аренды, тип {@link LocalDateTime}</li>
+ *     <li>end - дата и время окончания аренды, тип {@link LocalDateTime}</li>
+ * </ul>
  */
 
 @Data

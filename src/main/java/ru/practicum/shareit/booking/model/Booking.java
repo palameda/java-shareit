@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * <p>Data-класс Booking содержит информацию о сущности "бронирование" и имеет поля:</p>
+ * <p>Data-класс <strong>Booking</strong> содержит информацию о сущности "бронирование" и имеет поля:</p>
  * <ul>
  *     <li>id - уникальный идентификатор бронирования, тип {@link Integer};</li>
  *     <li>start - дата и время начала бронирования, тип {@link LocalDateTime};</li>

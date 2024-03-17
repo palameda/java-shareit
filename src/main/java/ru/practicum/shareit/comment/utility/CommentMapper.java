@@ -9,8 +9,21 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * Утилитарный класс CommentMapper предназначен для конвертации объектов классов {@link RequestComment},
+ * {@link RequestComment} и {@link Comment}
+ */
 @UtilityClass
 public class CommentMapper {
+
+    /**
+     * Статичный метод requestToComment конвертирует объект-запрос класса {@link RequestComment}
+     * в объект класса {@link Comment}
+     * @param comment объект-запрос класса {@link RequestComment}
+     * @param item объект класса {@link Item}
+     * @param author объект класса {@link User}
+     * @return объект класса {@link Comment}
+     */
     public static Comment requestToComment(RequestComment comment, Item item, User author) {
         return Comment.builder()
                 .item(item)
@@ -20,6 +33,12 @@ public class CommentMapper {
                 .build();
     }
 
+    /**
+     * Статичный метод requestToComment конвертирует объект класса {@link Comment} в объект-ответ
+     * класса {@link ResponseComment}
+     * @param comment объект класса {@link Comment}
+     * @return объект класса {@link ResponseComment}
+     */
     public static ResponseComment commentToResponse(Comment comment) {
         return ResponseComment.builder()
                 .id(comment.getId())

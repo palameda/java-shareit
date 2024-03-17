@@ -11,6 +11,16 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+/**
+ * <p>Data-класс <strong>Comment</strong> содержит информацию о сущности "комментарий" и имеет поля:</p>
+ * <ul>
+ *     <li>id - уникальный идентификатор комментария, тип {@link Integer};</li>
+ *     <li>item - вещь, на которую оставили комментарий, тип {@link Item};</li>
+ *     <li>author - автор комментария, тип {@link User};</li>
+ *     <li>text - текст комментария, тип {@link String};</li>
+ *     <li>created - дата и время оставленного комментария, тип {@link LocalDateTime};</li>
+ * </ul>
+ */
 @Data
 @Builder
 @RequiredArgsConstructor

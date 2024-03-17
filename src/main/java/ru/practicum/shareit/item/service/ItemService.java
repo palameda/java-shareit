@@ -3,9 +3,9 @@ package ru.practicum.shareit.item.service;
 import ru.practicum.shareit.comment.dto.RequestComment;
 import ru.practicum.shareit.comment.dto.ResponseComment;
 import ru.practicum.shareit.comment.model.Comment;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.exception.DenialOfAccessException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 

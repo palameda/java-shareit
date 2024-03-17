@@ -1,6 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingReference;
 import ru.practicum.shareit.comment.dto.ResponseComment;
 

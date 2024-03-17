@@ -22,6 +22,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Класс BookingServiceImplementation реализует методы интерфейса {@link BookingService}.
+ * Описывает логику работы приложения с сущностью {@link Booking}
+ * @see UserDbRepository
+ * @see ItemDbRepository
+ * @see BookingDbRepository
+ * @see Item
+ * @see User
+ * @see BookingDto
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Service

@@ -7,6 +7,15 @@ import lombok.RequiredArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+/**
+ * Data Transfer Object для сущности "Комментарий"
+ * Dto-класс RequestComment содержит поля:
+ * <ul>
+ *     <li>itemId - идентификатор вещи, тип {@link Integer}</li>
+ *     <li>userId - идентификатор пользователя, тип {@link Integer}</li>
+ *     <li>text - текст комментария, тип {@link String}</li>
+ * </ul>
+ */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
