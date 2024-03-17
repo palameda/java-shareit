@@ -14,7 +14,7 @@ public interface BookingService {
 
     public Booking findBookingById(Integer bookingId, Integer bookerId);
 
-    public List<Booking> findAllBookingForOwner(Integer ownerId, State state);
+    public List<Booking> findAllBookingForOwner(Integer ownerId, String state);
 
-    public List<Booking> findAllBookingsForBooker(Integer bookerId, State state);
+    public List<Booking> findAllBookingsForBooker(Integer bookerId, String state);
 }
