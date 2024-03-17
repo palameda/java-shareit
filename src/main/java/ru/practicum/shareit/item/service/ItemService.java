@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.comment.dto.RequestComment;
 import ru.practicum.shareit.comment.dto.ResponseComment;
+import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.exception.DenialOfAccessException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -54,11 +55,16 @@ public interface ItemService {
     void deleteItem(Integer itemId, Integer userId);
 
     /**
-     * Сервисный метод seekItem возвращает список вещей, найденных по запросу searchQuery
+     * Сервисный метод seekItem возвращает список вещей, найденных по запросу searchQuery.
      * @param searchQuery поисковый запрос, содержащий имя или описание вещи
      * @return список вещей, преобразованных в ItemDto, которые были найдены по поисковому запросу
      */
     List<ItemDto> seekItem(String searchQuery);
 
+    /**
+     * Сервисный метод addComment возвращает комментрий, который оставляет пользователь.
+     * @param comment объекта класса {@link Comment}
+     * @return комментарий пользователя, преобразованный в объект класса ResponseComment
+     */
     ResponseComment addComment(RequestComment comment);
 }

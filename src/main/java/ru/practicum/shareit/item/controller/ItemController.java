@@ -125,6 +125,7 @@ public class ItemController {
     public ResponseComment addComment(@Valid @RequestBody RequestComment requestComment,
                                       @RequestHeader("X-Sharer-User-Id") Integer userId,
                                       @PathVariable("id") Integer itemId) {
+        log.info("Контроллер: POST-запрос по эндпоинту /items/{}/comment от пользователя с id {}", userId, userId);
         requestComment.setItemId(itemId);
         requestComment.setUserId(userId);
         return itemService.addComment(requestComment);

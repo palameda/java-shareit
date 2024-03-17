@@ -26,18 +26,21 @@ public class BookingController {
     @GetMapping
     public List<Booking> findAllBookingsForBooker(@RequestHeader("X-Sharer-User-Id") Integer userId,
                                                   @RequestParam(defaultValue = "ALL") String state) {
+        log.info("Контроллер: GET-запрос по эндпоинту /bookings от пользователя с id {}", userId);
         return bookingService.findAllBookingsForBooker(userId, state);
     }
 
     @GetMapping("/{id}")
     public Booking findBookingById(@RequestHeader("X-Sharer-User-Id") Integer userId,
                                  @PathVariable("id") Integer bookingId) {
+        log.info("Контроллер: GET-запрос по эндпоинту /bookings/{} от пользователя с id {}", userId, userId);
         return bookingService.findBookingById(bookingId, userId);
     }
 
     @GetMapping("/owner")
     public List<Booking> findBookingsForOwner(
             @RequestHeader("X-Sharer-User-Id") Integer userId, @RequestParam(defaultValue = "ALL") String state) {
+        log.info("Контроллер: GET-запрос по эндпоинту /bookings/owner от пользователя с id {} для состояния {}", userId, state);
         return bookingService.findAllBookingForOwner(userId, state);
     }
 
@@ -45,6 +48,7 @@ public class BookingController {
     public Booking save(@Valid @RequestBody BookingDto booking, @RequestHeader("X-Sharer-User-Id") Integer userId) {
         booking.setUserId(userId);
         booking.setStatus(Status.WAITING);
+        log.info("Контроллер: POST-запрос по эндпоинту /bookings от пользователя с id {}", userId);
         return bookingService.save(booking);
     }
 
@@ -60,6 +64,7 @@ public class BookingController {
         } else {
             throw new NotFoundException("Ошибка статуса бронирования");
         }
+        log.info("Контроллер: PATCH-запрос по эндпоинту /bookings/{} от пользователя с id {}", userId, userId);
         return bookingService.update(bookingId, userId, status);
     }
 }

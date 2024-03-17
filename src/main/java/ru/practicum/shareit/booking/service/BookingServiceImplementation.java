@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.db.BookingDbRepository;
 import ru.practicum.shareit.booking.utility.BookingMapper;
 import ru.practicum.shareit.exception.BadArgumentException;
-import ru.practicum.shareit.exception.DenialOfAccessException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
@@ -38,6 +37,7 @@ public class BookingServiceImplementation implements BookingService {
     @Override
     public Booking save(BookingDto booking) {
         checkBooking(booking);
+        log.info("Сервис: обработка запроска на сохранение бронирования {}", booking.toString());
         return bookingRepository.save(BookingMapper.dtoToBooking(booking, item, user));
     }
 
@@ -54,6 +54,7 @@ public class BookingServiceImplementation implements BookingService {
             throw new ValidationException("Для бронирования с id " + bookingId + " уже установлен статус " + status);
         }
         booking.setStatus(status);
+        log.info("Сервис: обработка запроска на изменение бронирования {} пользователем с id {}", booking.toString(), bookerId);
         return bookingRepository.save(booking);
     }
 
@@ -63,6 +64,7 @@ public class BookingServiceImplementation implements BookingService {
         if (!((Objects.equals(booking.getItem().getOwnerId(), bookerId)) || (Objects.equals(booking.getBooker().getId(), bookerId))))
             throw new NotFoundException("Пользователь с id " + bookerId + " не может выполнять просмотр бронироввания с id " +
                     bookingId);
+        log.info("Сервис: обработка запроска на получение бронирования по id {} пользователем с id {}", bookingId, bookerId);
         return booking;
     }
 
@@ -70,6 +72,7 @@ public class BookingServiceImplementation implements BookingService {
     public List<Booking> findAllBookingForOwner(Integer ownerId, String state) {
         checkUserById(ownerId);
         State bookingState = checkState(state);
+        log.info("Сервис: обработка запроска на получение владельцем с id {} всех броней с состоянием {}", ownerId, state);
         switch (bookingState) {
             case ALL:
                 return bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId);
@@ -95,6 +98,7 @@ public class BookingServiceImplementation implements BookingService {
     public List<Booking> findAllBookingsForBooker(Integer bookerId, String state) {
         checkUserById(bookerId);
         State bookingState = checkState(state);
+        log.info("Сервис: обработка запроска на получение пользователем с id {} всех броней с состоянием {}", bookerId, state);
         switch (bookingState) {
             case ALL:
                 return bookingRepository.findAllByBookerIdOrderByIdDesc(bookerId);
@@ -117,34 +121,37 @@ public class BookingServiceImplementation implements BookingService {
     }
 
     private Item checkItem(BookingDto booking) {
+        log.info("Сервис: поиск вещи в системе");
         return itemRepository.findById(booking.getItemId()).orElseThrow(
                         () -> new NotFoundException("Вещь " + booking.toString() + " не зарегистрирована в системе")
                 );
     }
 
     private User checkUser(BookingDto booking) {
+        log.info("Сервис: поиск пользователя в системе");
         return userRepository.findById(booking.getUserId()).orElseThrow(
                         () -> new NotFoundException("Пользователь c id " + booking.getUserId() + " не зарегистрирован в системе")
                 );
     }
 
     private void checkUserById(Integer userId) {
+        log.info("Сервис: поиск пользователя с id {} в системе", userId);
         userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Пользователь c id " + userId + " не зарегистрирован в системе")
         );
     }
 
     private Booking checkBookingById(Integer bookingId) {
+        log.info("Сервис: поиск бронирования с id {} в системе", bookingId);
         return bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException("Бронирование c id " + bookingId + " не найдено в системе")
         );
     }
 
     private void checkBooking(BookingDto booking) {
-
         item = checkItem(booking);
         user = checkUser(booking);
-
+        log.info("Сервис: поиск бронирования в системе");
         if (booking.getStart() == null || booking.getEnd() == null)
             throw new ValidationException("Ошибка в данных даты начала или даты окончания бронирования");
 
@@ -159,6 +166,7 @@ public class BookingServiceImplementation implements BookingService {
     }
 
     private State checkState(String state) {
+        log.info("Сервис: валидация состояния бронирования");
         State bookingState;
         try {
             bookingState = State.valueOf(state);
