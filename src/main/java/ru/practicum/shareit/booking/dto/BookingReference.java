@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class BookingReference {
-    private Integer bookingId;
+    private Integer id;
     private Integer bookerId;
 }

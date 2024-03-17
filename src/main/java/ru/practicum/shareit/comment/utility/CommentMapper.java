@@ -15,17 +15,17 @@ public class CommentMapper {
         return Comment.builder()
                 .item(item)
                 .author(author)
-                .content(comment.getContent())
-                .creationDate(LocalDateTime.now())
+                .text(comment.getText())
+                .created(LocalDateTime.now())
                 .build();
     }
 
     public static ResponseComment commentToResponse(Comment comment) {
         return ResponseComment.builder()
-                .commentId(comment.getId())
-                .content(comment.getContent())
-                .author(comment.getAuthor().getName())
-                .creationDate(comment.getCreationDate())
+                .id(comment.getId())
+                .text(comment.getText())
+                .authorName(comment.getAuthor().getName())
+                .created(comment.getCreated())
                 .build();
     }
 }

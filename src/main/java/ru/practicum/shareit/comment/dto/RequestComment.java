@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 public class RequestComment {
     private Integer itemId;
     private Integer userId;
-    @NotBlank
+    @NotBlank(message = "Комментарий не должен быть пустым")
     @Size(max = 512)
-    private String content;
+    private String text;
 }

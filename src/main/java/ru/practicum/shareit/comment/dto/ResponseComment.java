@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class ResponseComment {
-    private Integer commentId;
-    private String content;
-    private String author;
-    private LocalDateTime creationDate;
+    private Integer id;
+    private String text;
+    private String authorName;
+    private LocalDateTime created;
 }
