@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.repository.db.UserDbRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ public class ItemServiceImplementation implements ItemService {
                             .findFirst()
                             .ifPresent(nextBooking -> itemDto.setNextBooking(ItemMapper.itemToBookingReference(nextBooking)));
                 })
+                .sorted(Comparator.comparing(ItemDto::getId))
                 .collect(Collectors.toList());
     }
 
@@ -135,6 +137,7 @@ public class ItemServiceImplementation implements ItemService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public ResponseComment addComment(RequestComment comment) {
         User author = checkUser(comment.getUserId());
