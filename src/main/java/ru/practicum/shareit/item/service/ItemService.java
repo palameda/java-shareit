@@ -1,8 +1,11 @@
 package ru.practicum.shareit.item.service;
 
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.comment.dto.RequestComment;
+import ru.practicum.shareit.comment.dto.ResponseComment;
+import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.exception.DenialOfAccessException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
@@ -21,9 +24,10 @@ public interface ItemService {
     /**
      * Сервисный метод findById возвращает данные о зарегистрированной вещи по переданному идентификатору.
      * @param itemId идентификатор вещи
+     * @param userId идентификатор пользователя
      * @return преобразованный в ItemDto объект класса Item
      */
-    ItemDto findById(Integer itemId);
+    ItemDto findById(Integer itemId, Integer userId);
 
     /**
      * Сервисный метод saveItem отправляет запрос к хранилищу на сохранение данных о новой вещи её владельцем.
@@ -51,9 +55,16 @@ public interface ItemService {
     void deleteItem(Integer itemId, Integer userId);
 
     /**
-     * Сервисный метод seekItem возвращает список вещей, найденных по запросу searchQuery
+     * Сервисный метод seekItem возвращает список вещей, найденных по запросу searchQuery.
      * @param searchQuery поисковый запрос, содержащий имя или описание вещи
      * @return список вещей, преобразованных в ItemDto, которые были найдены по поисковому запросу
      */
     List<ItemDto> seekItem(String searchQuery);
+
+    /**
+     * Сервисный метод addComment возвращает комментрий, который оставляет пользователь.
+     * @param comment объекта класса {@link Comment}
+     * @return комментарий пользователя, преобразованный в объект класса ResponseComment
+     */
+    ResponseComment addComment(RequestComment comment);
 }

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@Deprecated
 public class InMemoryItemRepository implements ItemRepository {
     private final List<Item> items;
     private Integer id = 1;

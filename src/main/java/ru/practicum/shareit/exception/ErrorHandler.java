@@ -20,6 +20,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler()
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationException(final ValidationException exception) {
+        log.info("Код 400 Bad Request - {}", exception.getMessage());
+        return Map.of("error", exception.getMessage());
+    }
+
+    @ExceptionHandler()
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Map<String, String> handleDenialOfAccessException(final DenialOfAccessException exception) {
         log.info("Код 403 Forbidden - {}", exception.getMessage());
@@ -45,5 +52,12 @@ public class ErrorHandler {
     public Map<String, String> handleUnknownException(final Exception exception) {
         log.info("Код 500 Internal Server Error - {}", exception.getMessage());
         return Map.of("errorMessage", exception.getMessage());
+    }
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleBadArgumentException(final BadArgumentException exception) {
+        log.info("Код 500 Internal Server Error - {}", exception.getMessage());
+        return Map.of("error", exception.getMessage());
     }
 }
