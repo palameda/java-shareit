@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.Status;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.NotFoundException;
 
@@ -28,11 +28,11 @@ public class BookingController {
      * обращается к методу {@link BookingService#findAllBookingsForBooker(Integer, String)}.
      * @param userId идентификатор арендатора вещей
      * @param state необязательный параметр, выражающий критерий для отбора арендованных вещей (по умолчанию ALL)
-     * @return список всех арендованных вещей пользователя, преобразованных в {@link Booking}.
+     * @return список всех арендованных вещей пользователя, преобразованных в {@link BookingResponseDto}.
      */
     @GetMapping
-    public List<Booking> findAllBookingsForBooker(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                                  @RequestParam(defaultValue = "ALL") String state) {
+    public List<BookingResponseDto> findAllBookingsForBooker(@RequestHeader("X-Sharer-User-Id") Integer userId,
+                                                             @RequestParam(defaultValue = "ALL") String state) {
         log.info("Контроллер: GET-запрос по эндпоинту /bookings от пользователя с id {}", userId);
         return bookingService.findAllBookingsForBooker(userId, state);
     }
@@ -42,10 +42,10 @@ public class BookingController {
      * обращается к методу {@link BookingService#findBookingById(Integer, Integer)}.
      * @param userId идентификатор пользователя, который совершает запрос
      * @param bookingId идентификатор арендованной вещи
-     * @return объект класса {@link Booking}
+     * @return объект класса {@link BookingResponseDto}
      */
     @GetMapping("/{id}")
-    public Booking findBookingById(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public BookingResponseDto findBookingById(@RequestHeader("X-Sharer-User-Id") Integer userId,
                                  @PathVariable("id") Integer bookingId) {
         log.info("Контроллер: GET-запрос по эндпоинту /bookings/{} от пользователя с id {}", userId, userId);
         return bookingService.findBookingById(bookingId, userId);
@@ -56,10 +56,10 @@ public class BookingController {
      * методу {@link BookingService#findAllBookingForOwner(Integer, String)}.
      * @param userId идентификатор арендодателя (владельца) вещи(ей)
      * @param state необязательный параметр, выражающий критерий для отбора арендованных вещей (по умолчанию ALL)
-     * @return список всех арендованных вещей арендодателя, преобразованных в {@link Booking}.
+     * @return список всех арендованных вещей арендодателя, преобразованных в {@link BookingResponseDto}.
      */
     @GetMapping("/owner")
-    public List<Booking> findBookingsForOwner(
+    public List<BookingResponseDto> findBookingsForOwner(
             @RequestHeader("X-Sharer-User-Id") Integer userId, @RequestParam(defaultValue = "ALL") String state) {
         log.info("Контроллер: GET-запрос по эндпоинту /bookings/owner от пользователя с id {} для состояния {}", userId, state);
         return bookingService.findAllBookingForOwner(userId, state);
@@ -67,13 +67,13 @@ public class BookingController {
 
     /**
      * Метод save обрабатывает POST-метод запроса к эндпоинту /bookings,
-     * обращается к методу {@link BookingService#save(BookingDto)}
-     * @param booking объект класса BookingDto
+     * обращается к методу {@link BookingService#save(BookingRequestDto)}
+     * @param booking объект класса BookingRequestDto
      * @param userId идентификатор арендодателя (владельца) вещи
-     * @return объект класса {@link Booking}
+     * @return объект класса {@link BookingResponseDto}
      */
     @PostMapping()
-    public Booking save(@Valid @RequestBody BookingDto booking, @RequestHeader("X-Sharer-User-Id") Integer userId) {
+    public BookingResponseDto save(@Valid @RequestBody BookingRequestDto booking, @RequestHeader("X-Sharer-User-Id") Integer userId) {
         booking.setUserId(userId);
         booking.setStatus(Status.WAITING);
         log.info("Контроллер: POST-запрос по эндпоинту /bookings от пользователя с id {}", userId);
@@ -86,10 +86,10 @@ public class BookingController {
      * @param userId идентификатор арендодателя (владельца) вещи
      * @param bookingId идентификатор аренды
      * @param approved статус аренды
-     * @return объект класса {@link Booking}
+     * @return объект класса {@link BookingResponseDto}
      */
     @PatchMapping("/{id}")
-    public Booking update(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public BookingResponseDto update(@RequestHeader("X-Sharer-User-Id") Integer userId,
                           @PathVariable("id") Integer bookingId,
                           @RequestParam String approved) {
         Status status;

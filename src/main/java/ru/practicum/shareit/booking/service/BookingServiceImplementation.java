@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.db.BookingDbRepository;
 import ru.practicum.shareit.booking.utility.BookingMapper;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Класс BookingServiceImplementation реализует методы интерфейса {@link BookingService}.
@@ -30,7 +32,8 @@ import java.util.Objects;
  * @see BookingDbRepository
  * @see Item
  * @see User
- * @see BookingDto
+ * @see BookingRequestDto
+ * @see BookingResponseDto
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -45,17 +48,19 @@ public class BookingServiceImplementation implements BookingService {
 
     @Transactional
     @Override
-    public Booking save(BookingDto booking) {
+    public BookingResponseDto save(BookingRequestDto booking) {
         checkBooking(booking);
         log.info("Сервис: обработка запроска на сохранение бронирования {}", booking.toString());
-        return bookingRepository.save(BookingMapper.dtoToBooking(booking, item, user));
+        return BookingMapper.bookingToResponseDto(
+                bookingRepository.save(BookingMapper.requestDtoToBooking(booking, item, user))
+        );
     }
 
     @Transactional
     @Override
-    public Booking update(Integer bookingId, Integer bookerId, Status status) {
+    public BookingResponseDto update(Integer bookingId, Integer bookerId, Status status) {
         Booking booking = checkBookingById(bookingId);
-        checkBooking(BookingMapper.bookingToDto(booking));
+        checkBooking(BookingMapper.bookingToRequestDto(booking));
         if (!Objects.equals(booking.getItem().getOwnerId(), bookerId)) {
             throw new NotFoundException("Пользователю с id " + bookerId + " отказано в редактировании брони. " +
                     "Причина: \"не является владельцем вещи\"");
@@ -65,79 +70,103 @@ public class BookingServiceImplementation implements BookingService {
         }
         booking.setStatus(status);
         log.info("Сервис: обработка запроска на изменение бронирования {} пользователем с id {}", booking.toString(), bookerId);
-        return bookingRepository.save(booking);
+        return BookingMapper.bookingToResponseDto(bookingRepository.save(booking));
     }
 
     @Override
-    public Booking findBookingById(Integer bookingId, Integer bookerId) {
+    public BookingResponseDto findBookingById(Integer bookingId, Integer bookerId) {
         Booking booking = checkBookingById(bookingId);
         if (!((Objects.equals(booking.getItem().getOwnerId(), bookerId)) || (Objects.equals(booking.getBooker().getId(), bookerId))))
             throw new NotFoundException("Пользователь с id " + bookerId + " не может выполнять просмотр бронироввания с id " +
                     bookingId);
         log.info("Сервис: обработка запроска на получение бронирования по id {} пользователем с id {}", bookingId, bookerId);
-        return booking;
+        return BookingMapper.bookingToResponseDto(booking);
     }
 
     @Override
-    public List<Booking> findAllBookingForOwner(Integer ownerId, String state) {
+    public List<BookingResponseDto> findAllBookingForOwner(Integer ownerId, String state) {
         checkUserById(ownerId);
         State bookingState = checkState(state);
         log.info("Сервис: обработка запроска на получение владельцем с id {} всех броней с состоянием {}", ownerId, state);
         switch (bookingState) {
             case ALL:
-                return bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId);
+                return bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case CURRENT:
                 return bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByIdDesc(
-                        ownerId, LocalDateTime.now(), LocalDateTime.now());
+                        ownerId, LocalDateTime.now(), LocalDateTime.now()).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findAllByItemOwnerIdAndStatusAndEndIsBeforeOrderByIdDesc(
-                        ownerId, Status.APPROVED, LocalDateTime.now());
+                        ownerId, Status.APPROVED, LocalDateTime.now()).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findAllByItemOwnerIdAndStatusInAndStartIsAfterOrderByIdDesc(
-                        ownerId, List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now());
+                        ownerId, List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now()).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.WAITING);
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.WAITING).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.REJECTED);
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(ownerId, Status.REJECTED).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             default:
                 throw new BadArgumentException("Unknown state: " + state);
         }
     }
 
     @Override
-    public List<Booking> findAllBookingsForBooker(Integer bookerId, String state) {
+    public List<BookingResponseDto> findAllBookingsForBooker(Integer bookerId, String state) {
         checkUserById(bookerId);
         State bookingState = checkState(state);
         log.info("Сервис: обработка запроска на получение пользователем с id {} всех броней с состоянием {}", bookerId, state);
         switch (bookingState) {
             case ALL:
-                return bookingRepository.findAllByBookerIdOrderByIdDesc(bookerId);
+                return bookingRepository.findAllByBookerIdOrderByIdDesc(bookerId).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case CURRENT:
                 return bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByIdAsc(bookerId,
-                        LocalDateTime.now(), LocalDateTime.now());
+                        LocalDateTime.now(), LocalDateTime.now()).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findAllByBookerIdAndStatusAndEndIsBeforeOrderByIdDesc(bookerId,
-                        Status.APPROVED, LocalDateTime.now());
+                        Status.APPROVED, LocalDateTime.now()).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findAllByBookerIdAndStatusInAndStartIsAfterOrderByIdDesc(bookerId,
-                        List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now());
+                        List.of(Status.APPROVED, Status.WAITING), LocalDateTime.now()).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.WAITING);
+                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.WAITING).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.REJECTED);
+                return bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(bookerId, Status.REJECTED).stream()
+                        .map(BookingMapper::bookingToResponseDto)
+                        .collect(Collectors.toList());
             default:
                 throw new BadArgumentException("Unknown state: " + state);
         }
     }
 
-    private Item checkItem(BookingDto booking) {
+    private Item checkItem(BookingRequestDto booking) {
         log.info("Сервис: поиск вещи в системе");
         return itemRepository.findById(booking.getItemId()).orElseThrow(
                         () -> new NotFoundException("Вещь " + booking.toString() + " не зарегистрирована в системе")
                 );
     }
 
-    private User checkUser(BookingDto booking) {
+    private User checkUser(BookingRequestDto booking) {
         log.info("Сервис: поиск пользователя в системе");
         return userRepository.findById(booking.getUserId()).orElseThrow(
                         () -> new NotFoundException("Пользователь c id " + booking.getUserId() + " не зарегистрирован в системе")
@@ -158,7 +187,7 @@ public class BookingServiceImplementation implements BookingService {
         );
     }
 
-    private void checkBooking(BookingDto booking) {
+    private void checkBooking(BookingRequestDto booking) {
         item = checkItem(booking);
         user = checkUser(booking);
         log.info("Сервис: поиск бронирования в системе");
