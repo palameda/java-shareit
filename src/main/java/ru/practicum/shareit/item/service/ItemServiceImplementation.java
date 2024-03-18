@@ -153,6 +153,13 @@ public class ItemServiceImplementation implements ItemService {
         );
     }
 
+    @Override
+    public List<ItemDto> findRequestedItems(Integer requestId) {
+        return itemRepository.findAllByRequestIdOrderByIdDesc(requestId).stream()
+                .map(ItemMapper::itemToDto)
+                .collect(Collectors.toList());
+    }
+
     /**
      * Приватный метод checkPossession проверяет является ли пользователь владельцем вещи.
      * Если пользователь не является владельцем вещи, то возникает исключение {@link DenialOfAccessException}
