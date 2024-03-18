@@ -29,4 +29,11 @@ public interface ItemDbRepository extends JpaRepository<Item, Integer> {
         "where (UPPER(it.name) like UPPER(concat('%', ?1, '%')) " +
         "or UPPER(it.description) like UPPER(concat('%', ?1, '%'))) and it.available = true")
     List<Item> findByNameOrDescriptionAndAvailable(String query);
+
+    /**
+     * Метод позволяет найти все вещи по запросу на добаление
+     * @param requestId идентификатор запроса
+     * @return список объектов класса {@link Item}
+     */
+    List<Item> findAllByRequestIdOrderByIdDesc(Integer requestId);
 }
