@@ -1,9 +1,6 @@
 package ru.practicum.shareit.comment.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -21,7 +18,8 @@ import java.time.LocalDateTime;
  *     <li>created - дата и время оставленного комментария, тип {@link LocalDateTime};</li>
  * </ul>
  */
-@Data
+@Getter
+@Setter
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
