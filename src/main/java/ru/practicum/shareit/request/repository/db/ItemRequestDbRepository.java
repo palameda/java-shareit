@@ -11,7 +11,7 @@ import java.util.List;
  * Расширяет {@link PagingAndSortingRepository}, предоставляющий методы для получения сущностей
  * с использованием абстракции пагинации и сортировки
  */
-public interface RequestDbRepository extends PagingAndSortingRepository<ItemRequest, Integer> {
+public interface ItemRequestDbRepository extends PagingAndSortingRepository<ItemRequest, Integer> {
     List<ItemRequest> findAllByAuthorIdOrderByIdDesc(Integer userId);
 
     List<ItemRequest> findAllByAuthorIdNot(Integer userId, Pageable pageable);
