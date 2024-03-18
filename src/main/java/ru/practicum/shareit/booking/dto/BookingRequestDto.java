@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class BookingDto {
+public class BookingRequestDto {
     private Integer id;
     @NotNull
     private Integer itemId;
