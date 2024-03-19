@@ -2,6 +2,7 @@ package ru.practicum.shareit.UserTest;
 
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.exception.DuplicateDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -83,7 +84,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Тест метода deleteUser")
     public void testShouldDeleteUserById() {
-
+        Assertions.assertDoesNotThrow(() -> userService.deleteUser(1));
     }
 
     @Test
@@ -93,6 +94,17 @@ public class UserServiceTest {
         assertThat(userService.saveUser(userResponse).getId(), equalTo(user.getId()));
         assertThat(userService.saveUser(userResponse).getName(), equalTo(user.getName()));
         assertThat(userService.saveUser(userResponse).getEmail(), equalTo(user.getEmail()));
+    }
+
+    @Test
+    @DisplayName("Тест метода saveUser")
+    public void testShouldFailSaveUserBecauseOfDuplicateData() {
+        when(userRepository.save(any(User.class))).thenThrow(new DuplicateDataException("errorMessage"));
+        DuplicateDataException exception = Assertions.assertThrows(
+                DuplicateDataException.class,
+                () -> userRepository.save(user)
+        );
+        assertThat(exception.getMessage(), equalTo("errorMessage"));
     }
 
     @Test
@@ -107,7 +119,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Тест метода updateUser для несуществующего пользователя")
     public void testShouldFailUpdateNonExistingUser() {
-        //when(userRepository.findById(1)).thenReturn(Optional.ofNullable(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
         userRequest.setId(2);
         NotFoundException exception = Assertions.assertThrows(
