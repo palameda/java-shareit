@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import javax.persistence.*;
 
@@ -11,8 +12,9 @@ import javax.persistence.*;
  *     <li>id - уникальный идентификатор вещи, тип Integer;</li>
  *     <li>name - краткое название, тип String;</li>
  *     <li>description - развёрнутое описание, тип String;</li>
- *     <li>ownerId - уникальный идентификатор владельца вещи, тип Integer</li>
- *     <li>available - статус о доступности вещи для аренды, тип Boolean.</li>
+ *     <li>ownerId - уникальный идентификатор владельца вещи, тип Integer;</li>
+ *     <li>available - статус о доступности вещи для аренды, тип Boolean;</li>
+ *     <li>request - запрос на добавление вещи, тип ItemRequest</li>
  * </ul>
  */
 
@@ -36,4 +38,7 @@ public class Item {
     private Integer ownerId;
     @Column(name = "available", nullable = false)
     private Boolean available;
+    @ManyToOne
+    @JoinColumn(name = "request_id")
+    private ItemRequest request;
 }
