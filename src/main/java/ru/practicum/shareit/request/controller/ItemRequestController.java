@@ -12,7 +12,8 @@ import ru.practicum.shareit.request.dto.ItemResponseDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -25,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
+    private static final String DEFAULT_PAGE_SIZE = "10";
     private final ItemRequestService itemRequestService;
 
     /**
@@ -63,9 +65,9 @@ public class ItemRequestController {
      */
     @GetMapping("/all")
     public List<ItemResponseDto> findAllRequests(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                                 @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                 @RequestParam(defaultValue = "1") @Min(1) int size) {
-        Pageable page = PageRequest.of(from / size, size, Sort.by("id").descending());
+                                                 @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                 @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) @Positive Integer size) {
+        Pageable page = PageRequest.of((from / size), size, Sort.by("id").descending());
         log.info("Контроллер: GET-запрос по эндпоинту /requests/all от пользователя с id={}, from={}, size={}",
                 userId, from, size);
         return itemRequestService.findAll(userId, page);
