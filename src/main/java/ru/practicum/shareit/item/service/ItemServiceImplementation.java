@@ -17,6 +17,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.db.ItemDbRepository;
 import ru.practicum.shareit.item.utility.ItemMapper;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.db.ItemRequestDbRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.db.UserDbRepository;
 
@@ -43,6 +45,7 @@ public class ItemServiceImplementation implements ItemService {
     private final UserDbRepository userRepository;
     private final BookingDbRepository bookingRepository;
     private final CommentDbRepository commentRepository;
+    private final ItemRequestDbRepository itemRequestRepository;
 
     @Override
     public List<ItemDto> findAll(Integer userId) {
@@ -89,10 +92,15 @@ public class ItemServiceImplementation implements ItemService {
     @Transactional
     @Override
     public ItemDto saveItem(ItemDto itemDto, Integer userId) {
-        log.info("Сервис: обработка запроса на сохранение вещи {} её владельцем с id {}", itemDto.getName(), userId);
         checkUser(userId);
-        Item savedItem = ItemMapper.dtoToItem(itemDto);
-        //savedItem.setOwnerId(userId);
+        ItemRequest itemRequest;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = itemRequestRepository.findById(itemDto.getRequestId()).orElse(null);
+        } else {
+            itemRequest = null;
+        }
+        Item savedItem = ItemMapper.dtoToItem(itemDto, itemRequest);
+        log.info("Сервис: обработка запроса на сохранение вещи {} её владельцем с id {}", itemDto.getName(), userId);
         return ItemMapper.itemToDto(itemRepository.save(savedItem));
     }
 
@@ -112,8 +120,17 @@ public class ItemServiceImplementation implements ItemService {
         if (itemDto.getAvailable() != null) {
             storedItem.setAvailable(itemDto.getAvailable());
         }
+        if (itemDto.getRequestId() != null) {
+            storedItem.setRequestId(itemDto.getRequestId());
+        }
+        ItemRequest itemRequest;
+        if (storedItem.getRequestId() != null) {
+            itemRequest = itemRequestRepository.findById(storedItem.getRequestId()).orElse(null);
+        } else {
+            itemRequest = null;
+        }
         return ItemMapper.itemToDto(
-                itemRepository.save(ItemMapper.dtoToItem(storedItem))
+                itemRepository.save(ItemMapper.dtoToItem(storedItem, itemRequest))
         );
     }
 
@@ -177,12 +194,14 @@ public class ItemServiceImplementation implements ItemService {
     }
 
     private User checkUser(Integer userId) {
+        log.info("Сервис: проверка регистрации пользователя с id {}", userId);
         return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("Пользователь с id " + userId + " не зарегистрирован в системе")
         );
     }
 
     private Item checkItem(Integer itemId) {
+        log.info("Сервис: проверка регистрации вещи с id {}", itemId);
         return itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException("Вещь c id " + itemId + " не зарегистрирована в системе")
         );
