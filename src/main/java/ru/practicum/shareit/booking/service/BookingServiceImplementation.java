@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
@@ -84,13 +85,13 @@ public class BookingServiceImplementation implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findAllBookingForOwner(Integer ownerId, String state) {
+    public List<BookingResponseDto> findAllBookingForOwner(Integer ownerId, String state, Pageable page) {
         checkUserById(ownerId);
         State bookingState = checkState(state);
         log.info("Сервис: обработка запроска на получение владельцем с id {} всех броней с состоянием {}", ownerId, state);
         switch (bookingState) {
             case ALL:
-                return bookingRepository.findAllByItemOwnerIdOrderByIdDesc(ownerId).stream()
+                return bookingRepository.findAllByItemOwnerId(ownerId, page).stream()
                         .map(BookingMapper::bookingToResponseDto)
                         .collect(Collectors.toList());
             case CURRENT:
@@ -122,13 +123,13 @@ public class BookingServiceImplementation implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findAllBookingsForBooker(Integer bookerId, String state) {
+    public List<BookingResponseDto> findAllBookingsForBooker(Integer bookerId, String state, Pageable page) {
         checkUserById(bookerId);
         State bookingState = checkState(state);
         log.info("Сервис: обработка запроска на получение пользователем с id {} всех броней с состоянием {}", bookerId, state);
         switch (bookingState) {
             case ALL:
-                return bookingRepository.findAllByBookerIdOrderByIdDesc(bookerId).stream()
+                return bookingRepository.findAllByBookerId(bookerId, page).stream()
                         .map(BookingMapper::bookingToResponseDto)
                         .collect(Collectors.toList());
             case CURRENT:

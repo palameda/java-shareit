@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repository.db;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.model.Booking;
@@ -18,7 +19,7 @@ public interface BookingDbRepository extends JpaRepository<Booking, Integer> {
      * @param bookerId идентификатор арендатора
      * @return список арендованных вещей, преобразованных в {@link Booking}
      */
-    List<Booking> findAllByBookerIdOrderByIdDesc(Integer bookerId);
+    List<Booking> findAllByBookerId(Integer bookerId, Pageable page);
 
     /**
      * Метод позволяет получить все текущие бронирования для арендатора.
@@ -69,7 +70,7 @@ public interface BookingDbRepository extends JpaRepository<Booking, Integer> {
      * @param ownerId идентификатор арендодатора
      * @return список арендованных вещей, преобразованных в {@link Booking}
      */
-    List<Booking> findAllByItemOwnerIdOrderByIdDesc(Integer ownerId);
+    List<Booking> findAllByItemOwnerId(Integer ownerId, Pageable page);
 
     /**
      *  Метод позволяет владельцу вещей получить информацию о текущих бронях на них
