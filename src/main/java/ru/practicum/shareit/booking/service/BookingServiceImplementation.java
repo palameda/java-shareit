@@ -11,7 +11,6 @@ import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.db.BookingDbRepository;
 import ru.practicum.shareit.booking.utility.BookingMapper;
-import ru.practicum.shareit.exception.BadArgumentException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
@@ -21,6 +20,7 @@ import ru.practicum.shareit.user.repository.db.UserDbRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -118,7 +118,7 @@ public class BookingServiceImplementation implements BookingService {
                         .map(BookingMapper::bookingToResponseDto)
                         .collect(Collectors.toList());
             default:
-                throw new BadArgumentException("Unknown state: " + state);
+                return Collections.emptyList();
         }
     }
 
@@ -156,7 +156,7 @@ public class BookingServiceImplementation implements BookingService {
                         .map(BookingMapper::bookingToResponseDto)
                         .collect(Collectors.toList());
             default:
-                throw new BadArgumentException("Unknown state: " + state);
+                return Collections.emptyList();
         }
     }
 
