@@ -62,6 +62,7 @@ public class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
     @Test
     @DisplayName("Тест GET запроса по эндпоинту /users/{id}")
     public void testShouldFindUserById() throws Exception {
