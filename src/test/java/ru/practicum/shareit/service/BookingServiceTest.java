@@ -1,28 +1,31 @@
-package ru.practicum.shareit.contorller;
+package ru.practicum.shareit.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
+import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.db.BookingDbRepository;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImplementation;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.db.ItemDbRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.db.UserDbRepository;
 
-import javax.xml.bind.ValidationException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -48,8 +51,8 @@ public class BookingServiceTest {
     private final BookingRequestDto bookingDto = BookingRequestDto.builder()
             .id(1)
             .itemId(1)
-            .start(LocalDateTime.now().plus(10, ChronoUnit.HOURS))
-            .end(LocalDateTime.now().plus(100, ChronoUnit.HOURS))
+            .start(LocalDateTime.now().plusHours(10))
+            .end(LocalDateTime.now().plusHours(100))
             .build();
     private final Booking booking = Booking.builder()
             .id(1)
@@ -69,142 +72,119 @@ public class BookingServiceTest {
     }
 
     @Test
-    @DisplayName("Запись бронирования")
-    void shouldSave() {
+    @DisplayName("Проверка метода save для Booking")
+    void testShouldSaveBookingOrThrowNotFoundException() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(user));
         when(itemRepository.findById(anyInt())).thenReturn(Optional.ofNullable(item));
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-
-        assertThat(bookingService.save(bookingDto).getBooker().getId(), equalTo(1));
         bookingDto.setStart(null);
         Assertions.assertThrows(
-                ValidationException.class,
+                NotFoundException.class,
                 () -> bookingService.save(bookingDto)
         );
 
-        bookingDto.setStart(LocalDateTime.now().plus(1000, ChronoUnit.HOURS));
+        bookingDto.setStart(LocalDateTime.now().plusHours(1000));
         Assertions.assertThrows(
-                ValidationException.class,
+                NotFoundException.class,
                 () -> bookingService.save(bookingDto)
         );
 
         assert item != null;
         item.setAvailable(false);
         Assertions.assertThrows(
-                ValidationException.class,
+                NotFoundException.class,
                 () -> bookingService.save(bookingDto)
         );
     }
 
     @Test
-    @DisplayName("Обновление бронирования")
-    void shouldUpdate() {
-        when(bookingRepository.findById(1L)).thenReturn(Optional.ofNullable(booking));
-        when(itemRepository.findById(anyLong())).thenReturn(Optional.ofNullable(item));
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+    @DisplayName("Проверка метода update для Booking")
+    void testShouldUpdateBookingOrThrowValidationException() {
+        when(bookingRepository.findById(1)).thenReturn(Optional.ofNullable(booking));
+        when(itemRepository.findById(anyInt())).thenReturn(Optional.ofNullable(item));
+        when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(user));
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-
-        Assertions.assertEquals(bookingService.update(1L, 1L, BookingStatus.REJECTED)
-                .getId(), 1L);
-        Assertions.assertThrows(ValidateException.class, () ->
-                bookingService.update(1L, 1L, BookingStatus.REJECTED));
-
+        Assertions.assertThrows(NotFoundException.class,
+                () -> bookingService.update(1, 1, Status.REJECTED)
+        );
     }
 
     @Test
-    @DisplayName("Просмотр бронирования")
-    void shouldGet() {
-        when(bookingRepository.findById(anyLong())).thenReturn(Optional.ofNullable(booking));
-        Assertions.assertEquals(bookingService.getCertain(1L, 1L).getStatus(), BookingStatus.WAITING);
-
-        Assertions.assertThrows(AccessException.class,
-                () -> bookingService.getCertain(1L, 3L).getStatus());
+    @DisplayName("Проверка метода findBookingById для Booking")
+    void testShouldFindBookingByIdOrThrowNotFoundException() {
+        when(bookingRepository.findById(anyInt())).thenReturn(Optional.ofNullable(booking));
+        assertThat(bookingService.findBookingById(1, 1).getStatus(), is(Status.WAITING));
+        Assertions.assertThrows(NotFoundException.class,
+                () -> bookingService.findBookingById(1, 3)
+        );
     }
 
     @Test
-    @DisplayName("Просмотр бронирований")
-    void shouldAny() {
-        when(bookingRepository.findByItem_IdAndStartIsBeforeOrderByEndDesc(anyLong(), any(LocalDateTime.class)))
+    @DisplayName("Проверка метода findAll для Booking")
+    void testShouldFindAllBookingsByItemIdOrItemIdAndBookerId() {
+        when(bookingRepository.findByItemIdAndStartIsBeforeOrderByEndDesc(anyInt(), any(LocalDateTime.class)))
                 .thenReturn(List.of(booking));
-        when(bookingRepository.findAllByItem_IdAndBooker_IdAndStatusAndEndIsBefore(anyLong(), anyLong(),
-                any(BookingStatus.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
-
-
-        Assertions.assertNotEquals(bookingService.getBookingByItemOld(1L), 0);
-        Assertions.assertNotEquals(bookingService.getBookingByItemNew(1L, BookingStatus.WAITING), 0);
-        Assertions.assertNotEquals(bookingService.getBookingByItemUserStatusOld(1L, 1L), 0);
+        when(bookingRepository.findAllByItemIdAndBookerIdAndStatusAndEndIsBefore(anyInt(), anyInt(),
+                any(Status.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
     }
 
     @Test
-    @DisplayName("Получаем бронирования по заявителю")
-    void shouldGetByBooker() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(bookingRepository.findAllByBooker_Id(anyLong(), any(Pageable.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByIdAsc(anyLong(),
+    @DisplayName("Проверка findAllBookingsForBooker для Booking")
+    void testShouldFindAllBookingsForBooker() {
+        when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(user));
+        when(bookingRepository.findAllByBookerId(anyInt(), any(Pageable.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByIdAsc(anyInt(),
                 any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByBooker_IdAndStatusAndEndIsBeforeOrderByIdDesc(anyLong(),
-                any(BookingStatus.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByBooker_IdAndStatusInAndStartIsAfterOrderByIdDesc(anyLong(), any(),
+        when(bookingRepository.findAllByBookerIdAndStatusAndEndIsBeforeOrderByIdDesc(anyInt(),
+                any(Status.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByBookerIdAndStatusInAndStartIsAfterOrderByIdDesc(anyInt(), any(),
                 any(LocalDateTime.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByBooker_IdAndStatusOrderByIdDesc(anyLong(), any(BookingStatus.class)))
+        when(bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(anyInt(), any(Status.class)))
                 .thenReturn(List.of(booking));
-        when(bookingRepository.findAllByBooker_IdAndStatusOrderByIdDesc(anyLong(), any(BookingStatus.class)))
+        when(bookingRepository.findAllByBookerIdAndStatusOrderByIdDesc(anyInt(), any(Status.class)))
                 .thenReturn(List.of(booking));
 
-        Assertions.assertEquals(bookingService.getBookingForBooker(1L,
-                BookingStatusParam.ALL, Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForBooker(1L,
-                BookingStatusParam.CURRENT, Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForBooker(1L,
-                BookingStatusParam.PAST, Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForBooker(1L,
-                BookingStatusParam.FUTURE, Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForBooker(1L,
-                BookingStatusParam.WAITING, Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForBooker(1L,
-                BookingStatusParam.REJECTED, Pageable.ofSize(10)).size(), 1);
+        assertThat(bookingService.findAllBookingsForBooker(1,
+                String.valueOf(State.ALL), Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingsForBooker(1,
+                String.valueOf(State.CURRENT), Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingsForBooker(1,
+                String.valueOf(State.PAST), Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingsForBooker(1,
+                String.valueOf(State.FUTURE), Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingsForBooker(1,
+                String.valueOf(State.WAITING), Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingsForBooker(1,
+                String.valueOf(State.REJECTED), Pageable.ofSize(10)).size(), equalTo(1));
     }
 
     @Test
-    @DisplayName("Получение бронирований по владельцу")
+    @DisplayName("Проверка findAllBookingsForOwner для Booking")
     void shouldGetByOwner() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(bookingRepository.findAllByItemOwner(anyLong(), any(Pageable.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByItemOwnerAndStartIsBeforeAndEndIsAfterOrderByIdDesc(anyLong(),
+        when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(user));
+        when(bookingRepository.findAllByItemOwnerId(anyInt(), any(Pageable.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByIdDesc(anyInt(),
                 any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByItemOwnerAndStatusAndEndIsBeforeOrderByIdDesc(anyLong(),
-                any(BookingStatus.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByItemOwnerAndStatusInAndStartIsAfterOrderByIdDesc(
-                anyLong(), any(), any(LocalDateTime.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findAllByItemOwnerAndStatusOrderByIdDesc(anyLong(), any(BookingStatus.class)))
-                .thenReturn(List.of(booking));
-        when(bookingRepository.findAllByItemOwnerAndStatusOrderByIdDesc(anyLong(), any(BookingStatus.class)))
-                .thenReturn(List.of(booking));
+        when(bookingRepository.findAllByItemOwnerIdAndStatusAndEndIsBeforeOrderByIdDesc(anyInt(),
+                any(Status.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByItemOwnerIdAndStatusInAndStartIsAfterOrderByIdDesc(anyInt(),
+                any(), any(LocalDateTime.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(anyInt(),
+                any(Status.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByItemOwnerIdAndStatusOrderByIdDesc(anyInt(),
+                any(Status.class))).thenReturn(List.of(booking));
 
-        Assertions.assertEquals(bookingService.getBookingForOwner(1L, BookingStatusParam.ALL,
-                Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForOwner(1L, BookingStatusParam.CURRENT,
-                Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForOwner(1L, BookingStatusParam.PAST,
-                Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForOwner(1L, BookingStatusParam.FUTURE,
-                Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForOwner(1L, BookingStatusParam.WAITING,
-                Pageable.ofSize(10)).size(), 1);
-        Assertions.assertEquals(bookingService.getBookingForOwner(1L, BookingStatusParam.REJECTED,
-                Pageable.ofSize(10)).size(), 1);
-
-    }
-
-
-    @Test
-    @DisplayName("Фиктивный тест на маппер")
-    void test_cannot_instantiate() {
-        Assertions.assertThrows(InvocationTargetException.class, () -> {
-            var constructor = BookingMapper.class.getDeclaredConstructor();
-            Assertions.assertTrue(Modifier.isPrivate(constructor.getModifiers()));
-            constructor.setAccessible(true);
-            constructor.newInstance();
-        });
+        assertThat(bookingService.findAllBookingForOwner(1, String.valueOf(State.ALL),
+                Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingForOwner(1, String.valueOf(State.CURRENT),
+                Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingForOwner(1, String.valueOf(State.PAST),
+                Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingForOwner(1, String.valueOf(State.FUTURE),
+                Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingForOwner(1, String.valueOf(State.WAITING),
+                Pageable.ofSize(10)).size(), equalTo(1));
+        assertThat(bookingService.findAllBookingForOwner(1, String.valueOf(State.REJECTED),
+                Pageable.ofSize(10)).size(), equalTo(1));
     }
 }
