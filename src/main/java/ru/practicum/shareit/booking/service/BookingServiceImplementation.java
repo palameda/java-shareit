@@ -118,6 +118,7 @@ public class BookingServiceImplementation implements BookingService {
                         .map(BookingMapper::bookingToResponseDto)
                         .collect(Collectors.toList());
             default:
+                log.info("Сервис: критерия отбора {} не существует", state);
                 return Collections.emptyList();
         }
     }
@@ -156,6 +157,7 @@ public class BookingServiceImplementation implements BookingService {
                         .map(BookingMapper::bookingToResponseDto)
                         .collect(Collectors.toList());
             default:
+                log.info("Сервис: критерия отбора {} не существует", state);
                 return Collections.emptyList();
         }
     }
