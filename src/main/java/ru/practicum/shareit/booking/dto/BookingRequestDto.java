@@ -1,9 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.booking.Status;
 
 import javax.validation.constraints.Future;
@@ -34,8 +31,10 @@ public class BookingRequestDto {
     private Integer itemId;
     private Integer userId;
     private Status status;
+    @ToString.Exclude
     @FutureOrPresent
     private LocalDateTime start;
+    @ToString.Exclude
     @Future
     private LocalDateTime end;
 }
