@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/test/java/ru/practicum/shareit/service/integration/UserServiceIntegrationTest.java
 package ru.practicum.shareit.service.integration;
+========
+package ru.practicum.shareit.service;
+>>>>>>>> origin/add-item-requests:src/test/java/ru/practicum/shareit/service/UserServiceTest.java
 
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
