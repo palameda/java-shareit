@@ -12,7 +12,18 @@ import java.util.List;
  * с использованием абстракции пагинации и сортировки
  */
 public interface ItemRequestDbRepository extends PagingAndSortingRepository<ItemRequest, Integer> {
+    /**
+     * Метод возвращает список всех запросов по автору
+     * @param userId идентификатор автора запроса
+     * @return список объектов {@link ItemRequest}
+     */
     List<ItemRequest> findAllByAuthorIdOrderByIdDesc(Integer userId);
 
+    /**
+     * Метод возвращает список всех запросом, кроме запросов автора
+     * @param userId идентификатор автора запроса
+     * @param pageable количество записей на странице {@link Pageable}
+     * @return список объектов {@link ItemRequest}
+     */
     List<ItemRequest> findAllByAuthorIdNot(Integer userId, Pageable pageable);
 }
