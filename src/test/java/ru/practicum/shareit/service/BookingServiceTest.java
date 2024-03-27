@@ -289,4 +289,16 @@ public class BookingServiceTest {
         Assertions.assertFalse(ownerItems.isEmpty());
         Assertions.assertEquals(ownerItems.get(0).toString(), bookingResponse.toString());
     }
+
+    @Test
+    @DisplayName("Тест метода update. Выбрасывает NotFoundException когда владелец бронирует свои вещи")
+    void testUpdate_whenOwnerBooksOwnedItems_thenThrowNotFoundException() {
+        when(bookingRepository.findById(anyInt())).thenReturn(Optional.ofNullable(booking));
+        when(itemRepository.findById(anyInt())).thenReturn(Optional.ofNullable(item));
+        when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(booker));
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> bookingService.update(booking.getId(), booking.getId(), Status.APPROVED)
+        );
+    }
 }
