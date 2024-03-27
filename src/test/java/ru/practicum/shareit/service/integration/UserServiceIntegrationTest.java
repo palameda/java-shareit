@@ -12,8 +12,10 @@ import ru.practicum.shareit.user.service.UserServiceImplementation;
 
 import java.util.List;
 import java.util.Optional;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

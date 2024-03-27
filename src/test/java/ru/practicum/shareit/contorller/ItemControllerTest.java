@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.comment.dto.RequestComment;
 import ru.practicum.shareit.comment.dto.ResponseComment;
 import ru.practicum.shareit.exception.DenialOfAccessException;
-import ru.practicum.shareit.exception.DuplicateDataException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -22,7 +21,6 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
