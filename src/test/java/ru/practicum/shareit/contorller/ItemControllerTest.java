@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.comment.dto.RequestComment;
 import ru.practicum.shareit.comment.dto.ResponseComment;
+import ru.practicum.shareit.exception.DenialOfAccessException;
+import ru.practicum.shareit.exception.DuplicateDataException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -20,6 +22,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,7 +39,7 @@ public class ItemControllerTest {
     @MockBean
     private ItemService service;
 
-    private final ItemDto itemIn = ItemDto.builder()
+    private final ItemDto itemDto = ItemDto.builder()
             .name("item")
             .description("description")
             .available(true)
@@ -60,13 +63,13 @@ public class ItemControllerTest {
     void testShouldSaveItemWithStatusOK() throws Exception {
         when(service.saveItem(any(ItemDto.class), anyInt())).thenReturn(itemResponse);
         mvc.perform(post("/items")
-                        .content(mapper.writeValueAsString(itemIn))
+                        .content(mapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", "1")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is(itemIn.getDescription())));
+                .andExpect(jsonPath("$.description", is(itemDto.getDescription())));
     }
 
     @Test
@@ -79,7 +82,7 @@ public class ItemControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is(itemIn.getDescription())));
+                .andExpect(jsonPath("$.description", is(itemDto.getDescription())));
     }
 
     @Test
@@ -87,7 +90,7 @@ public class ItemControllerTest {
     void testShouldUpdateItemWithStatusOK() throws Exception {
         when(service.updateItem(any(ItemDto.class), anyInt())).thenReturn(itemResponse);
         mvc.perform(patch("/items/1")
-                        .content(mapper.writeValueAsString(itemIn))
+                        .content(mapper.writeValueAsString(itemDto))
                         .header("X-Sharer-User-Id", "1")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -132,6 +135,18 @@ public class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Тест GET запроса по эндпоинту /items/search")
+    void testShouldReturnItemsUsingSearchStringWithStatusOk() throws Exception {
+        when(service.seekItem(anyString())).thenReturn(List.of(itemResponse));
+        mvc.perform(get("/items/search")
+                        .param("text", "")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("Тест POST запроса по эндпоинту /items/id/comment")
     void testShouldAddCommentWithStatusOk() throws Exception {
         when(service.addComment(any(RequestComment.class))).thenReturn(commentResponse);
@@ -142,5 +157,31 @@ public class ItemControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Тест PATCH запроса по эндпоинту /items/id. Выбрасывает DenialOfAccessException")
+    void testUpdate_whenUserIsNotOwner_thenStatusIsForbidden() throws Exception {
+        when(service.updateItem(any(ItemDto.class), anyInt())).thenThrow(new DenialOfAccessException("errorMessage"));
+        mvc.perform(patch("/items/1")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .header("X-Sharer-User-Id", "2")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Тест PATCH запроса по эндпоинту /items/id. Выбрасывает RuntimeException")
+    void testUpdate_whenSomethingWentWrong_thenStatusIsServerError() throws Exception {
+        when(service.updateItem(any(ItemDto.class), anyInt())).thenThrow(new RuntimeException("errorMessage"));
+        mvc.perform(patch("/items/1")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .header("X-Sharer-User-Id", "2")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError());
     }
 }
