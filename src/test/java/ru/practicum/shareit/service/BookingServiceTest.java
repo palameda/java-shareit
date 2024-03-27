@@ -46,6 +46,7 @@ public class BookingServiceTest {
     private Item item;
     private Item saveItem;
     private Booking booking;
+    private Booking newBooking;
 
     @BeforeEach
     void setup() {
@@ -77,6 +78,11 @@ public class BookingServiceTest {
         booking = new Booking(1,
                 LocalDateTime.now(), LocalDateTime.now().plusHours(2),
                 item, owner, Status.WAITING
+        );
+
+        newBooking = new Booking(2,
+                LocalDateTime.now(), LocalDateTime.now().plusHours(2),
+                item, booker, Status.WAITING
         );
 
         booking.setStart(LocalDateTime.now());
@@ -291,6 +297,22 @@ public class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Тест findAllBookingForOwner с UnsupportedState. Выбрасывает ValidationException")
+    void findAllBookingForOwner_whenStateIsUnknown_thenThrowValidationException() {
+        Integer ownerId = 1;
+        int size = 1;
+        String state = "UNSUPPORTED";
+        Pageable page = Pageable.ofSize(size);
+        BookingResponseDto bookingResponse = BookingMapper.bookingToResponseDto(booking);
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
+        Assertions.assertThrows(
+                ValidationException.class,
+                () -> bookingService.findAllBookingForOwner(ownerId, state, page)
+        );
+        verify(userRepository, times(1)).findById(anyInt());
+    }
+
+    @Test
     @DisplayName("Тест метода update. Выбрасывает NotFoundException когда владелец бронирует свои вещи")
     void testUpdate_whenOwnerBooksOwnedItems_thenThrowNotFoundException() {
         when(bookingRepository.findById(anyInt())).thenReturn(Optional.ofNullable(booking));
@@ -300,5 +322,45 @@ public class BookingServiceTest {
                 NotFoundException.class,
                 () -> bookingService.update(booking.getId(), booking.getId(), Status.APPROVED)
         );
+    }
+
+    @Test
+    @DisplayName("Тест метода update. Выбрасывает NotFoundException когда отказано в редактировании")
+    void testUpdate_whenUserIsNotOwner_thenThrowNotFoundException() {
+        when(bookingRepository.findById(anyInt())).thenReturn(Optional.ofNullable(newBooking));
+        when(itemRepository.findById(anyInt())).thenReturn(Optional.ofNullable(item));
+        when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(booker));
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> bookingService.update(newBooking.getId(), booker.getId(), Status.WAITING)
+        );
+        verify(bookingRepository, times(1)).findById(anyInt());
+        verify(itemRepository, times(1)).findById(anyInt());
+        verify(userRepository, times(1)).findById(anyInt());
+    }
+
+    @Test
+    @DisplayName("Тест метода update. Выбрасывает ValidationException, когда статус уже установлен")
+    void testUpdate_whenDuplicateStatus_thenValidationException() {
+        when(bookingRepository.findById(anyInt())).thenReturn(Optional.ofNullable(newBooking));
+        when(itemRepository.findById(anyInt())).thenReturn(Optional.ofNullable(item));
+        when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(booker));
+        Assertions.assertThrows(
+                ValidationException.class,
+                () -> bookingService.update(newBooking.getId(), owner.getId(), Status.WAITING)
+        );
+        verify(bookingRepository, times(1)).findById(anyInt());
+        verify(itemRepository, times(1)).findById(anyInt());
+        verify(userRepository, times(1)).findById(anyInt());
+    }
+
+    @Test
+    @DisplayName("Тест метода update. Выбрасывает NotFoundException, когда бронь не обнаружена")
+    void testUpdate_whenBookingNotFound_thenThrowNotFoundException() {
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> bookingService.update(newBooking.getId(), owner.getId(), Status.WAITING)
+        );
+        verify(bookingRepository, times(1)).findById(anyInt());
     }
 }
