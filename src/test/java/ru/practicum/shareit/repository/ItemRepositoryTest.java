@@ -38,6 +38,7 @@ public class ItemRepositoryTest {
     private Item item1;
     private Item item2;
     private Item item3;
+
     @BeforeEach
     void setup() {
         requestAuthor1 = User.builder()

@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.equalTo;
 @DataJpaTest
 @Import(AppConfig.class)
 public class RequestRepositoryTest {
-    private final Pageable RECORDS_AMOUNT = Pageable.ofSize(5);
+    private static final Pageable RECORDS_AMOUNT = Pageable.ofSize(5);
     @Autowired
     private ItemRequestDbRepository itemRequestRepository;
 

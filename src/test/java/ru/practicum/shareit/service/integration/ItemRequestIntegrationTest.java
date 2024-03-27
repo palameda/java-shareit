@@ -122,6 +122,7 @@ public class ItemRequestIntegrationTest {
         ItemResponseDto savedRequest = itemRequestService.findById(itemRequest.getId(), user.getId());
         Assertions.assertEquals(itemRequest.getCreated(), savedRequest.getCreated());
     }
+
     @Test
     @DisplayName("Тест метода findById. Возвращает NotFoundException, когда user не найден")
     void testFindById_whenUserNotFound_thenReturnNotFoundException() {

@@ -26,16 +26,17 @@ public class CommentMappingTest {
     RequestComment requestComment = new RequestComment(item.getId(), user.getId(), "text");
     Comment comment;
     ResponseComment responseComment;
+
     @Test
     @DisplayName("Проверка маппинга комментария из запроса в комментарий-модель")
-    void requestToComment_whenInvoked_thenReturnComment() {
+    void testRequestToComment_whenInvoked_thenReturnComment() {
         comment = CommentMapper.requestToComment(requestComment, item, user);
         Assertions.assertEquals(comment.getAuthor().toString(), user.toString());
     }
 
     @Test
     @DisplayName("Проверка маппинга комментария из модели в комментарий-ответ")
-    void сommentToResponse_whenInvoked_thenReturnResponseComment() {
+    void testCommentToResponse_whenInvoked_thenReturnResponseComment() {
         comment = CommentMapper.requestToComment(requestComment, item, user);
         responseComment = CommentMapper.commentToResponse(comment);
         Assertions.assertEquals(responseComment.getAuthorName(), user.getName());

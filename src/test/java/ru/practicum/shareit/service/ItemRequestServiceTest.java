@@ -87,6 +87,7 @@ public class ItemRequestServiceTest {
         ItemRequest savedRequest = itemRequestService.findRequestById(itemRequest.getId(), user.getId());
         Assertions.assertEquals(itemRequest.getAuthor(), savedRequest.getAuthor());
     }
+
     @Test
     @DisplayName("Тест метода findRequestById. Возвращает NotFoundException, когда user не найден")
     void testFindRequestById_whenUserNotFound_thenReturnNotFoundException() {
@@ -116,6 +117,7 @@ public class ItemRequestServiceTest {
         ItemResponseDto savedRequest = itemRequestService.findById(itemRequest.getId(), user.getId());
         Assertions.assertEquals(itemRequest.getCreated(), savedRequest.getCreated());
     }
+
     @Test
     @DisplayName("Тест метода findById. Возвращает NotFoundException, когда user не найден")
     void testFindById_whenUserNotFound_thenReturnNotFoundException() {
