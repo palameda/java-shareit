@@ -81,7 +81,6 @@ public class ItemController {
             @PathVariable("id") Integer itemId) {
         log.info("Контроллер: PATCH-запрос по эндпоинту /items/{} пользователем с id {}", itemId, userId);
         itemDto.setId(itemId);
-        itemDto.setOwnerId(userId);
         return itemService.updateItem(itemDto, userId);
     }
 
