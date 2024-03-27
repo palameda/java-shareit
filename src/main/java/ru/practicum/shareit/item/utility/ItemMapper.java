@@ -5,6 +5,7 @@ import ru.practicum.shareit.booking.dto.BookingReference;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 /**
  * <p>Утилитарный класс ItemMapper предназначен для конвертации объектов, хранящихся в репозитории,
@@ -20,13 +21,14 @@ public class ItemMapper {
      * @param  itemDto dto объект, содержащий данные о вещи
      * @return объект класса Item, полученный в результате преобразования itemDto
      */
-    public static Item dtoToItem(ItemDto itemDto) {
+    public static Item dtoToItem(ItemDto itemDto, ItemRequest itemRequest) {
         return Item.builder()
                 .id(itemDto.getId())
                 .ownerId(itemDto.getOwnerId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
+                .request(itemRequest)
                 .build();
     }
 
@@ -42,6 +44,7 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
                 .build();
     }
 

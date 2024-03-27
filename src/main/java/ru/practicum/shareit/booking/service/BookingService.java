@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -45,7 +46,7 @@ public interface BookingService {
      * @param state критерий отбора
      * @return список вещей, отобранных по критерию {@link State} и преобразованных в {@link BookingResponseDto}
      */
-    public List<BookingResponseDto> findAllBookingForOwner(Integer ownerId, String state);
+    public List<BookingResponseDto> findAllBookingForOwner(Integer ownerId, String state, Pageable page);
 
     /**
      * Метод позволяет арендатору вещей получить информацию о своих бронях.
@@ -53,5 +54,5 @@ public interface BookingService {
      * @param state критерий отбора
      * @return список вещей, отобранных по критерию {@link State} и преобразованных в {@link BookingResponseDto}
      */
-    public List<BookingResponseDto> findAllBookingsForBooker(Integer bookerId, String state);
+    public List<BookingResponseDto> findAllBookingsForBooker(Integer bookerId, String state, Pageable page);
 }

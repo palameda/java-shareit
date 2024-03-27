@@ -40,4 +40,5 @@ public class ItemDto {
     private BookingReference lastBooking;
     private BookingReference nextBooking;
     private List<ResponseComment> comments;
+    private Integer requestId;
 }

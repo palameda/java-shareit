@@ -2,6 +2,10 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -10,6 +14,8 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.NotFoundException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -17,24 +23,29 @@ import java.util.List;
  * Взаимодествует со слоем сервиса с помощью внедрённой зависимости {@link BookingService}.
  */
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
+    private static final String DEFAULT_PAGE_SIZE = "10";
     private final BookingService bookingService;
 
     /**
      * Метод findAllBookingsForBooker обрабатывает GET-метод запроса к эндпоинту /bookings,
-     * обращается к методу {@link BookingService#findAllBookingsForBooker(Integer, String)}.
+     * обращается к методу {@link BookingService#findAllBookingsForBooker(Integer, String, Pageable)}.
      * @param userId идентификатор арендатора вещей
      * @param state необязательный параметр, выражающий критерий для отбора арендованных вещей (по умолчанию ALL)
      * @return список всех арендованных вещей пользователя, преобразованных в {@link BookingResponseDto}.
      */
     @GetMapping
     public List<BookingResponseDto> findAllBookingsForBooker(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                                             @RequestParam(defaultValue = "ALL") String state) {
+                                                             @RequestParam(defaultValue = "ALL") String state,
+                                                             @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                             @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) @Positive Integer size) {
         log.info("Контроллер: GET-запрос по эндпоинту /bookings от пользователя с id {}", userId);
-        return bookingService.findAllBookingsForBooker(userId, state);
+        Pageable page = PageRequest.of((from / size), size, Sort.by("id").descending());
+        return bookingService.findAllBookingsForBooker(userId, state, page);
     }
 
     /**
@@ -53,16 +64,19 @@ public class BookingController {
 
     /**
      * Метод findBookingsForOwner обрабатывает GET-метод запроса к эндпоинту /bookings/owner, обращается к
-     * методу {@link BookingService#findAllBookingForOwner(Integer, String)}.
+     * методу {@link BookingService#findAllBookingForOwner(Integer, String, Pageable)}.
      * @param userId идентификатор арендодателя (владельца) вещи(ей)
      * @param state необязательный параметр, выражающий критерий для отбора арендованных вещей (по умолчанию ALL)
      * @return список всех арендованных вещей арендодателя, преобразованных в {@link BookingResponseDto}.
      */
     @GetMapping("/owner")
     public List<BookingResponseDto> findBookingsForOwner(
-            @RequestHeader("X-Sharer-User-Id") Integer userId, @RequestParam(defaultValue = "ALL") String state) {
+            @RequestHeader("X-Sharer-User-Id") Integer userId, @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) @Positive Integer size) {
         log.info("Контроллер: GET-запрос по эндпоинту /bookings/owner от пользователя с id {} для состояния {}", userId, state);
-        return bookingService.findAllBookingForOwner(userId, state);
+        Pageable page = PageRequest.of((from / size), size, Sort.by("id").descending());
+        return bookingService.findAllBookingForOwner(userId, state, page);
     }
 
     /**

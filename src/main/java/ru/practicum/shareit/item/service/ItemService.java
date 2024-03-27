@@ -67,4 +67,11 @@ public interface ItemService {
      * @return комментарий пользователя, преобразованный в объект класса ResponseComment
      */
     ResponseComment addComment(RequestComment comment);
+
+    /**
+     * Сервисный метод для получения списка всех вещей по запросу
+     * @param requestId идентификатор запроса
+     * @return список объектов класс {@link ItemDto}
+     */
+    List<ItemDto> findRequestedItems(Integer requestId);
 }
