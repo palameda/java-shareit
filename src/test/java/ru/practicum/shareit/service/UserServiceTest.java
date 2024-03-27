@@ -146,4 +146,25 @@ public class UserServiceTest {
         userService.deleteUser(userId);
         verify(userRepository, times(1)).deleteById(anyInt());
     }
+
+    @Test
+    @DisplayName("Тест метода saveUser. Выбрасывает DuplicationDataException, т.к. email уже зарегистрирован")
+    void testSaveUser_whenEmailAlreadyRegistered_thenDuplicationDataExceptionThrown() {
+        when(userRepository.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
+        Assertions.assertThrows(
+                DuplicateDataException.class,
+                () -> userService.saveUser(UserMapper.userToDto(user))
+        );
+    }
+
+    @Test
+    @DisplayName("Тест метода updateUser. Выбрасывает DuplicationDataException, т.к. email уже зарегистрирован")
+    void testUpdateUser_whenEmailAlreadyRegistered_thenDuplicationDataExceptionThrown() {
+        when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
+        Assertions.assertThrows(
+                DuplicateDataException.class,
+                () -> userService.updateUser(UserMapper.userToDto(user))
+        );
+    }
 }
